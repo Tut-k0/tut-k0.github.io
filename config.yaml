@@ -35,6 +35,8 @@ params:
   gitRepo: https://github.com/Tut-k0/personal-page
   gitBranch: master
 
+  background: "images/bg.jpeg"
+
   # specify whether you want to write some blog posts or not
   enableBlogPost: false
 
