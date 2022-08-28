@@ -37,6 +37,11 @@ params:
 
   background: "images/bg.jpeg"
 
+  darkMode:
+    enable: true
+    provider: darkreader
+    default: system
+
   # specify whether you want to write some blog posts or not
   enableBlogPost: false
 

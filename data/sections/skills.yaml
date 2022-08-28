@@ -13,7 +13,7 @@ skills:
     url: "https://www.python.org/"
 
   - name: Structured Query Language
-    logo: /images/sections/skills/sql.jpeg
+    logo: /images/sections/skills/sql.png
     summary: "Quite familiar with SQL, used in personal projects alongside supporting company applications for development and end user issues/reporting. Majority of my experience is in T-SQL specifically."
 
   - name: Git Version Control
@@ -26,7 +26,7 @@ skills:
     summary: "Personal and professional experience testing the security of applications. Finding bugs and vulnerabilities via site walking, scanning, and fuzzing, utilizing tools such as BurpSuite to make this process easier."
 
   - name: Cyber Security
-    logo: /images/sections/skills/cybersec.jpeg
+    logo: /images/sections/skills/cybersec.png
     summary: "CompTIA Sec+ Certified giving me core knowledge in Cryptography, Data Security, Threat Analysis, and more. I also spend free time learning or playing CTFs via TryHackMe or HackTheBox."
     url: "https://tryhackme.com/p/Tutk0"
 
