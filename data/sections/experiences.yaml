@@ -1,0 +1,61 @@
+section:
+  name: Experiences
+  id: experiences
+  enable: true
+  weight: 3
+  showOnNavbar: true
+
+experiences:
+  - company:
+      name: QUES
+      url: "https://www.ques.com/"
+      location: St. Louis, MO
+      # company overview
+      overview: QUES provides electric distribution, transmission and substation engineering, utility asset management, electric power project management and other ancillary utility infrastructure support services.
+    positions:
+      - designation: IT Quality Assurance Analyst
+        start: October 2020
+        responsibilities:
+          - Developing T-SQL stored procedures and writing various scripts for supporting applications.
+          - Writing and maintaining functional and UI automation tests.
+          - Writing and maintaining an API load testing suite.
+          - Lead QA tester on new applications, performing regression testing and feature testing.
+          - Minor development work using Unity and Blender working with 3D modeling.
+          - Collaborating with end users and internal team to identify and resolve data issues.
+          - Working with developers by reviewing code and working through writing tests together.
+          - Auditing application security in down time and reporting and remediating vulnerabilities.
+
+  - company:
+      name: Panera Bread
+      url: "https://www.panerabread.com/en-us/home.html"
+      location: St. Louis, MO
+      overview: Panera Bread Company is an American chain store of bakery-café fast casual restaurants with over 2,000 locations, all of which are in the United States and Canada. I worked in the Fresh Dough Facility producing the bread for the cafés.
+    positions:
+      - designation: Production Lead
+        start: July 2019
+        end: May 2020
+        responsibilities:
+          - Trained 10 new employees.
+          - Trained to do the administration for the facility late 2019.
+          - Oversaw 20 employees every day and was responsible for all bread produced.
+      - designation: Mixer
+        start: November 2017
+        end: July 2019
+        responsibilities:
+          - Scaling ingredients to standard as per formulas.
+          - Mixing the dough and making adjustments on the fly for any batches out of desired end product.
+          - Follow safety protocols and FDA standards when working with machinery and cleaning equipment with allergens.
+
+  - company:
+      name: Cusanelli's Restaurant
+      location: St. Louis, MO
+      overview: Cusanelli's was an italian restaurant serving foods like pizza, steak, and pasta.
+    positions:
+      - designation: Lead Cook
+        start: October 2015
+        end: November 2017
+        responsibilities:
+          - Preparing food and cooking it to customer satisfaction.
+          - Training new employees on cooking.
+          - Ensure station stayed cleaned and maintained during shift.
+          - In late 2017 started training as a Kitchen Manager.

@@ -45,4 +45,16 @@ skills:
 
   - name: Mac Operating System
     logo: /images/sections/skills/mac.png
-    summary: "Utilized professionally when automating iOS mobile applications. A preferable option if cross platform development is in order, or for creating apps in Apple's device ecosystem."
+    summary: "Utilized professionally when automating iOS mobile applications. A preferable option if cross platform development is in order, familiar with tools like XCode and coca-pods building mobile applications."
+
+  - name: JavaScript Development
+    logo: /images/sections/skills/js.png
+    summary: "Comfortable reading and writing code, used in personal projects on the frontend with Vue and on the backend using express and websockets."
+
+  - name: C Development
+    logo: /images/sections/skills/C.png
+    summary: "The first language I dabbled and experimented in. Most conversant in reading and reviewing code. A lot of C applications come up in security training."
+
+  - name: C# Development
+    logo: /images/sections/skills/csharp.png
+    summary: "Used in professional applications I have supported. Comfortable reading and reviewing code. Some usage in personal projects around security exploration."
