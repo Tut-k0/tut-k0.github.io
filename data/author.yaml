@@ -2,6 +2,7 @@ name: "David Chandler"
 nickname: "David"
 
 greeting: "Hello! I am"
+image: "images/author/me.png"
 
 contactInfo:
   email: "tut_k0@protonmail.com"
