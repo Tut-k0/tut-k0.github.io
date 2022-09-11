@@ -43,7 +43,23 @@ projects:
     timeline: "September 2021 - Present"
     repo: https://github.com/Tut-k0/python_sec_programs
     #url: ""
-    summary: A collection of offensive scripts written in Python. The collection features scripts for ARP spoofing, DNS spoofing, injecting code, and more!
+    summary: A collection of offensive scripts written in Python. The collection features scripts for ARP spoofing, DNS spoofing, injecting code, and more! All uses for this repo are for ethical learning purposes only.
     tags: ["personal", "Stale WIP"]
 
-  # TODO: Add last 2 featured projects.
+  - name: Hackerman in C
+    logo: /images/sections/projects/py.png
+    role: Owner
+    timeline: "September 2022 - Present"
+    repo: https://github.com/Tut-k0/hackerman
+    #url: ""
+    summary: This program is sort of a joke between friends, and was originally written in Python by a buddy and turned into a "lets write this in more programming languages" type of challenge.
+    tags: [ "personal", "hobby"]
+
+  - name: Network Lab
+    logo: /images/sections/projects/network.png
+    role: Owner
+    timeline: "August 2022 - Present"
+    repo: https://github.com/Tut-k0/network-lab
+    #url: ""
+    summary: Probably my most ambitious project yet, this project is for setting up a customizable VM lab to practice sys admin or offensive security activities. End goal is to also have a Terraform script for cloud formation.
+    tags: [ "personal", "hobby", "WIP"]
