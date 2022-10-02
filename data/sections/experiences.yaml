@@ -7,6 +7,18 @@ section:
 
 experiences:
   - company:
+      name: Emerson
+      url: "https://www.emerson.com/en-us"
+      location: St. Louis, MO
+      overview: Emerson has two focused business platforms, Automation Solutions and Commercial & Residential Solutions, which combines advanced technologies, industry-leading expertise and an insatiable curiosity about the world to create sustainable solutions for our customers.
+    positions:
+      - designation: Attack Surface and Vulnerability Management Security Analyst
+        start: September 2022
+        responsibilities:
+          - Managing perimeter security through continuous discovery, analysis, remediation and monitoring of the organization's attack surface.
+          - Writing Python scripts to pull data from 3rd party APIs for easier data analysis and reporting.
+          - Creating visual reports based on attack surface findings.
+  - company:
       name: QUES
       url: "https://www.ques.com/"
       location: St. Louis, MO
@@ -15,6 +27,7 @@ experiences:
     positions:
       - designation: IT Quality Assurance Analyst
         start: October 2020
+        end: September 2022
         responsibilities:
           - Developing T-SQL stored procedures and writing various scripts for supporting applications.
           - Writing and maintaining functional and UI automation tests.
