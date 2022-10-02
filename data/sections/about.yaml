@@ -5,13 +5,13 @@ section:
   weight: 1
   showOnNavbar: true
 
-designation: Quality Assurance Analyst
+designation: Information Security Analyst (ASM)
 
 company:
-  name: QUES
-  url: "https://www.ques.com/"
+  name: Emerson
+  url: "https://www.emerson.com/en-us"
 
-summary: "I am an enthusiastic QA analyst with 2 years of working experience. I spend most of my free time working on developing my cyber security and software skills. Currently I am on a certification learning spree. Sometimes I create fun projects with friends!"
+summary: "I am an enthusiastic Infosec Analyst with 2 years of working experience in the technology industry. I spend most of my free time working on developing my cyber security and software skills. Currently I am on a certification learning spree. Sometimes I create fun projects with friends!"
 
 socialLinks:
   - name: Email
