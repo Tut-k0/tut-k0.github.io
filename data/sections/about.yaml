@@ -5,13 +5,13 @@ section:
   weight: 1
   showOnNavbar: true
 
-designation: Information Security Analyst (ASM)
+designation: Offensive Security Engineer
 
 company:
   name: Emerson
   url: "https://www.emerson.com/en-us"
 
-summary: "I am an enthusiastic Infosec Analyst with 2 years of working experience in the technology industry. I spend most of my free time working on developing my cyber security and software skills. Currently I am on a certification learning spree. Sometimes I create fun projects with friends!"
+summary: "I am an enthusiastic Offensive Security Engineer with 3 years of working experience in the technology industry. I spend most of my free time working on developing my cyber security and software skills. Currently I am on a offensive security certification learning journey. Sometimes I create fun projects with friends!"
 
 socialLinks:
   - name: Email
@@ -37,11 +37,6 @@ badges:
     badge: "https://images.credly.com/size/340x340/images/74790a75-8451-400a-8536-92d792c5184a/CompTIA_Security_2Bce.png"
 
   - type: soft-skill-indicator
-    name: CompTIA Net+
-    percentage: 50
-    color: "#E30000FF"
-
-  - type: soft-skill-indicator
     name: Dependability
     percentage: 100
     color: "#663399FF"
@@ -58,5 +53,5 @@ badges:
 
   - type: soft-skill-indicator
     name: Leadership
-    percentage: 75
+    percentage: 70
     color: blue
