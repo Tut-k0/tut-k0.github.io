@@ -108,6 +108,7 @@ const NormalMode = () => {
                         <h2 className="text-2xl font-bold text-green-400 mb-4">Certifications</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[
+                                'CRTO - Certified Red Team Operator',
                                 'CPTS - Certified Penetration Testing Specialist',
                                 'Security+ - CompTia Sec+',
                             ].map((cert) => (
@@ -126,6 +127,7 @@ const NormalMode = () => {
                                 'BlackSky Hailstorm - Amazon Web Services',
                                 'BlackSky Cyclone - Azure Environment',
                                 'BlackSky Blizzard - Google Cloud Platform',
+                                'Orion - Mini Lab',
                             ].map((cert) => (
                                 <div key={cert} className="flex items-center p-3 bg-gray-700 rounded-lg">
                                     <span className="text-gray-200">{cert}</span>

@@ -59,6 +59,7 @@ const HeroSection = () => {
             output: [
                 '🏅 Certifications:',
                 '',
+                '• CRTO - Certified Red Team Operator',
                 '• CPTS - Certified Penetration Testing Specialist',
                 '• Security+ - CompTia Sec+',
                 '',
@@ -66,7 +67,8 @@ const HeroSection = () => {
                 '',
                 '• BlackSky Hailstorm - AWS lab focusing on compromising various AWS services.',
                 '• BlackSky Cyclone - Azure lab focusing on compromising various Azure services.',
-                '• BlackSky Blizzard - GCP lab focusing on compromising various GCP services.'
+                '• BlackSky Blizzard - GCP lab focusing on compromising various GCP services.',
+                '• Orion - Enumeration, Public Exploits, Active Directory, Pivoting.'
             ]
         },
         skills: {
@@ -136,7 +138,7 @@ const HeroSection = () => {
     };
 
     // URL regex pattern
-    const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/ig;
 
     // Helper function to parse text and return segments with URLs identified
     const parseTextWithLinks = (text) => {
@@ -235,6 +237,7 @@ const HeroSection = () => {
         inputRef.current?.focus();
     };
 
+    // eslint-disable-next-line react/prop-types
     const OutputLine = ({ line }) => {
         if (line === '') {
             return <div className="h-4"></div>;
