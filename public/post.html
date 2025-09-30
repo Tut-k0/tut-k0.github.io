@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post - David Chandler</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="css/prism-tomorrow.min.css">
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-container">
+        <div class="nav-brand">DC</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="experience.html">Experience</a>
+            <a href="projects.html">Projects</a>
+            <a href="blog.html" class="active">Blog</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <a href="blog.html" style="color: var(--accent); text-decoration: none; display: inline-block; margin-bottom: 2rem;">
+        ← Back to Blog
+    </a>
+
+    <article>
+        <div id="post-meta" style="margin-bottom: 2rem;">
+            <div class="blog-meta" id="post-date"></div>
+        </div>
+        <div id="post-content" class="blog-post-content">
+            <p style="color: var(--text-secondary);">Loading post...</p>
+        </div>
+    </article>
+</main>
+
+<footer class="footer">
+    <p>Built without a framework because we don't need the bloat.</p>
+</footer>
+
+<script src="js/marked.min.js"></script>
+<script src="js/prism.min.js"></script>
+<!-- Core language components that are commonly needed -->
+<script src="js/prism-markup.min.js"></script>
+<script src="js/prism-clike.min.js"></script>
+<script src="js/prism-javascript.min.js"></script>
+<script src="js/prism-markup-templating.min.js"></script>
+
+<!-- most used languages -->
+<script src="js/prism-python.min.js"></script>
+<script src="js/prism-bash.min.js"></script>
+<script src="js/prism-go.min.js"></script>
+<script src="js/prism-c.min.js"></script>
+<script src="js/prism-csharp.min.js"></script>
+<script src="js/prism-sql.min.js"></script>
+<script src="js/prism-powershell.min.js"></script>
+<script src="js/prism-json.min.js"></script>
+<script src="js/prism-yaml.min.js"></script>
+<script src="js/prism-markdown.min.js"></script>
+<script src="js/prism-css.min.js"></script>
+<script src="js/prism-http.min.js"></script>
+<script src="js/prism-rust.min.js"></script>
+<script src="js/prism-php.min.js"></script>
+<script src="js/prism-ruby.min.js"></script>
+<script src="js/prism-java.min.js"></script>
+<script src="js/prism-docker.min.js"></script>
+<script src="js/prism-nginx.min.js"></script>
+
+<script>
+    // Custom renderer to fix image paths
+    const renderer = new marked.Renderer();
+    const originalImageRenderer = renderer.image.bind(renderer);
+
+    renderer.image = function(href, title, text) {
+        return originalImageRenderer(href, title, text);
+    };
+
+    // Get post slug from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const postSlug = urlParams.get('id');
+
+    if (!postSlug) {
+        document.getElementById('post-content').innerHTML =
+            '<p style="color: var(--text-secondary);">Post not found.</p>';
+    } else {
+        // Load the blog index to get post metadata
+        fetch('blog/index.json')
+            .then(response => response.json())
+            .then(posts => {
+                const post = posts.find(p => p.slug === postSlug);
+
+                if (!post) {
+                    throw new Error('Post not found in index');
+                }
+
+                // Update page title and meta
+                document.title = `${post.title} - David Chandler`;
+                document.getElementById('post-date').textContent =
+                    `${post.date}${post.tags ? ' • ' + post.tags.join(', ') : ''}`;
+
+                // Load the markdown file
+                return fetch(`blog/${post.file}`);
+            })
+            .then(response => response.text())
+            .then(markdown => {
+                // Configure marked for syntax highlighting
+                marked.setOptions({
+                    renderer: renderer,
+                    highlight: function(code, lang) {
+                        if (lang && Prism.languages[lang]) {
+                            return Prism.highlight(code, Prism.languages[lang], lang);
+                        }
+                        return code;
+                    },
+                    breaks: true,
+                    gfm: true
+                });
+
+                // Convert markdown to HTML
+                const html = marked.parse(markdown);
+                document.getElementById('post-content').innerHTML = html;
+
+                // Apply Prism to any code blocks that weren't caught
+                Prism.highlightAll();
+            })
+            .catch(error => {
+                console.error('Error loading post:', error);
+                document.getElementById('post-content').innerHTML =
+                    '<p style="color: var(--text-secondary);">Error loading post. Please try again later.</p>';
+            });
+    }
+</script>
+</body>
+</html>
