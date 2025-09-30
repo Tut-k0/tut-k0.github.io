@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - David Chandler</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-container">
+        <div class="nav-brand">DC</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="experience.html">Experience</a>
+            <a href="projects.html">Projects</a>
+            <a href="blog.html" class="active">Blog</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <section>
+        <h2>Blog</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+            Technical notes, CTF writeups, tool development, and security research.
+        </p>
+
+        <!-- Search and Filter Controls -->
+        <div class="blog-controls">
+            <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Search posts by title or description..."
+                    class="search-input"
+            />
+            <div class="filter-controls">
+                <label for="tag-filter" style="color: var(--text-secondary);">Filter by tag:</label>
+                <select id="tag-filter" class="tag-filter">
+                    <option value="">All tags</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="blog-list" class="blog-list">
+            <p style="color: var(--text-secondary);">Loading posts...</p>
+        </div>
+
+        <div id="no-results" style="display: none; color: var(--text-secondary); text-align: center; padding: 2rem;">
+            No posts found matching your search.
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <p>Built without a framework because we don't need the bloat.</p>
+</footer>
+
+<script>
+    let allPosts = [];
+
+    // Load blog posts from index
+    fetch('blog/index.json')
+        .then(response => response.json())
+        .then(posts => {
+            allPosts = posts;
+
+            // Populate tag filter
+            const tagFilter = document.getElementById('tag-filter');
+            const allTags = new Set();
+            posts.forEach(post => {
+                if (post.tags) {
+                    post.tags.forEach(tag => allTags.add(tag));
+                }
+            });
+
+            // Sort tags alphabetically
+            const sortedTags = Array.from(allTags).sort();
+            sortedTags.forEach(tag => {
+                const option = document.createElement('option');
+                option.value = tag;
+                option.textContent = tag;
+                tagFilter.appendChild(option);
+            });
+
+            // Display all posts initially
+            displayPosts(posts);
+
+            // Setup search and filter event listeners
+            document.getElementById('search-input').addEventListener('input', filterPosts);
+            document.getElementById('tag-filter').addEventListener('change', filterPosts);
+        })
+        .catch(error => {
+            console.error('Error loading blog posts:', error);
+            document.getElementById('blog-list').innerHTML =
+                '<p style="color: var(--text-secondary);">No posts yet. Check back soon!</p>';
+        });
+
+    function displayPosts(posts) {
+        const blogList = document.getElementById('blog-list');
+        const noResults = document.getElementById('no-results');
+
+        if (posts.length === 0) {
+            blogList.style.display = 'none';
+            noResults.style.display = 'block';
+            return;
+        }
+
+        blogList.style.display = 'grid';
+        noResults.style.display = 'none';
+        blogList.innerHTML = '';
+
+        posts.forEach(post => {
+            const card = document.createElement('a');
+            card.href = `post.html?id=${post.slug}`;
+            card.className = 'blog-post-card';
+
+            const tagsHtml = post.tags ?
+                `<div class="blog-tags">${post.tags.map(tag => `<span class="blog-tag">${tag}</span>`).join('')}</div>`
+                : '';
+
+            card.innerHTML = `
+                    <h3>${post.title}</h3>
+                    <div class="blog-meta">${post.date}</div>
+                    ${tagsHtml}
+                    <p>${post.description}</p>
+                `;
+
+            blogList.appendChild(card);
+        });
+    }
+
+    function filterPosts() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const selectedTag = document.getElementById('tag-filter').value;
+
+        let filteredPosts = allPosts;
+
+        // Filter by search term (title or description)
+        if (searchTerm) {
+            filteredPosts = filteredPosts.filter(post =>
+                post.title.toLowerCase().includes(searchTerm) ||
+                post.description.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        // Filter by tag
+        if (selectedTag) {
+            filteredPosts = filteredPosts.filter(post =>
+                post.tags && post.tags.includes(selectedTag)
+            );
+        }
+
+        displayPosts(filteredPosts);
+    }
+</script>
+</body>
+</html>

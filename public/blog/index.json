@@ -1,0 +1,10 @@
+[
+  {
+    "title": "Welcome to My Corner of the Internet",
+    "slug": "welcome",
+    "file": "welcome.md",
+    "date": "09/30/2025",
+    "description": "An introduction to this blog and what you can expect - CTF writeups, tool development, security research, and technical notes from an offensive security engineer.",
+    "tags": ["meta", "introduction"]
+  }
+]
