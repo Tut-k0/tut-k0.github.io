@@ -4,7 +4,7 @@
     "slug": "oracle-database-testing",
     "file": "oracle-database-testing.md",
     "date": "11/27/2025",
-    "description": "A walkthrough of my methodology testing Oracle TNS listeners.",
+    "description": "A walkthrough of my general methodology testing Oracle TNS listeners.",
     "tags": [
       "oracle",
       "database",

