@@ -95,7 +95,7 @@
                 <div class="post-meta">
                     <time datetime="11/27/2025">11/27/2025</time>
                     <span class="meta-separator">&bull;</span>
-                    <span class="reading-time">63 min read</span>
+                    <span class="reading-time">64 min read</span>
                     <span class="post-tags">oracle • database • penetration-testing • odat • privilege-escalation • internal-network</span>
                 </div>
             </header>
@@ -827,13 +827,15 @@ t<span class="w"> </span><span class="o">(</span>ACL<span class="o">)</span><spa
 </div>
 
 <h2 id="file-readwritedelete">File Read/Write/Delete<a href="#file-readwritedelete" class="heading-anchor" aria-label="Link to this section">#</a></h2>
-<p>The following modules allow you to either read, write, or delete files, and are extremely useful in privilege escalating usually. All the methods are "blind" so you need to know the full paths of where you are reading/writing.
-- <a href="https://github.com/quentinhardy/odat/wiki/ctxsys"><strong>ctxsys</strong></a>: This module can be used to download a file stored on the database server.
-- <a href="https://github.com/quentinhardy/odat/wiki/dbmsadvisor"><strong>dbmsadvisor</strong></a>: This module can be used to upload a file on the database server.
-- <a href="https://github.com/quentinhardy/odat/wiki/dbmslob"><strong>dbmslob</strong></a>: This module can be used to download files on the database server.
-- <a href="https://github.com/quentinhardy/odat/wiki/dbmsxslprocessor"><strong>dbmsxslprocessor</strong></a>: This module can be used to upload a file on the database server.
-- <a href="https://github.com/quentinhardy/odat/wiki/externaltable"><strong>externaltable</strong></a>: This module can be used to download files or run a script on the database server. (There are requirements to execute a script with this method)
-- <a href="https://github.com/quentinhardy/odat/wiki/utlfile"><strong>utlfile</strong></a>: This module can be used to upload, download, or delete a file from the database server.</p>
+<p>The following modules allow you to either read, write, or delete files, and are extremely useful in privilege escalating usually. All the methods are "blind" so you need to know the full paths of where you are reading/writing.</p>
+<ul>
+<li><a href="https://github.com/quentinhardy/odat/wiki/ctxsys"><strong>ctxsys</strong></a>: This module can be used to download a file stored on the database server.</li>
+<li><a href="https://github.com/quentinhardy/odat/wiki/dbmsadvisor"><strong>dbmsadvisor</strong></a>: This module can be used to upload a file on the database server.</li>
+<li><a href="https://github.com/quentinhardy/odat/wiki/dbmslob"><strong>dbmslob</strong></a>: This module can be used to download files on the database server.</li>
+<li><a href="https://github.com/quentinhardy/odat/wiki/dbmsxslprocessor"><strong>dbmsxslprocessor</strong></a>: This module can be used to upload a file on the database server.</li>
+<li><a href="https://github.com/quentinhardy/odat/wiki/externaltable"><strong>externaltable</strong></a>: This module can be used to download files or run a script on the database server. (There are requirements to execute a script with this method)</li>
+<li><a href="https://github.com/quentinhardy/odat/wiki/utlfile"><strong>utlfile</strong></a>: This module can be used to upload, download, or delete a file from the database server.</li>
+</ul>
 <h3 id="utl_file">UTL_FILE<a href="#utl_file" class="heading-anchor" aria-label="Link to this section">#</a></h3>
 <p>Out of the above options, I am going to go over using the <code>utlfile</code> module. The <code>utlfile</code> permission I see quite often associated with medium level privilege database accounts. This one is quite powerful, as you can upload, download, and delete files. As stated prior, you will need to know the full path of the files you want to download or upload to. I usually start by mapping out the operating system environment which will be Linux based in my examples.</p>
 <blockquote>
@@ -939,13 +941,15 @@ ebsdb:/u01/install/APPS/19.0.0:N
 </code></pre></div>
 </div>
 
-<p>So now we have the SIDs of the database, and the home directory file paths which is typically what the <code>$ORACLE_HOME</code> environment variable is set to. There are many files that are helpful you could go grab now at this point within the Oracle environment, which I won't showcase fully, but here are some common ones (<code>$ORACLE_HOME</code> in this case is <code>/u01/install/APPS/19.0.0</code>):
-- <code>$ORACLE_HOME/network/admin/listener.ora</code>: Definition for database listener
-- <code>$ORACLE_HOME/network/admin/sqlnet.ora</code>: Definition for CDB which has the location for the <code>IFILE</code>.
-- <code>$ORACLE_HOME/network/admin/tnsnames.ora</code>: Definition for a database, has TNS connection strings and the aliases they map to.
-- <code>$ORACLE_HOME/network/admin/$NAME/sqlnet_ifile.ora</code>: The ifile has definitions such as what IP addresses can access the database, and potentially much more. The <code>$NAME</code> can be derived from the <code>sqlnet.ora</code> which contains the full path for this ifile.
-- <code>$ORACLE_HOME/dbs/init&lt;SID&gt;.ora</code>: The init file which contains parameters, replace <code>&lt;SID&gt;</code> with the actual SID.
--  <code>$ORACLE_HOME/dbs/spfile&lt;SID&gt;.ora</code>: The server parameter file, replace <code>&lt;SID&gt;</code> with the actual SID.</p>
+<p>So now we have the SIDs of the database, and the home directory file paths which is typically what the <code>$ORACLE_HOME</code> environment variable is set to. There are many files that are helpful you could go grab now at this point within the Oracle environment, which I won't showcase fully, but here are some common ones (<code>$ORACLE_HOME</code> in this case is <code>/u01/install/APPS/19.0.0</code>):</p>
+<ul>
+<li><code>$ORACLE_HOME/network/admin/listener.ora</code>: Definition for database listener</li>
+<li><code>$ORACLE_HOME/network/admin/sqlnet.ora</code>: Definition for CDB which has the location for the <code>IFILE</code>.</li>
+<li><code>$ORACLE_HOME/network/admin/tnsnames.ora</code>: Definition for a database, has TNS connection strings and the aliases they map to.</li>
+<li><code>$ORACLE_HOME/network/admin/$NAME/sqlnet_ifile.ora</code>: The ifile has definitions such as what IP addresses can access the database, and potentially much more. The <code>$NAME</code> can be derived from the <code>sqlnet.ora</code> which contains the full path for this ifile.</li>
+<li><code>$ORACLE_HOME/dbs/init&lt;SID&gt;.ora</code>: The init file which contains parameters, replace <code>&lt;SID&gt;</code> with the actual SID.</li>
+<li><code>$ORACLE_HOME/dbs/spfile&lt;SID&gt;.ora</code>: The server parameter file, replace <code>&lt;SID&gt;</code> with the actual SID.</li>
+</ul>
 <h4 id="getting-ssh-access">Getting SSH Access<a href="#getting-ssh-access" class="heading-anchor" aria-label="Link to this section">#</a></h4>
 <p>This should go without saying, but you probably also want to see if you can grab the SSH key for the database user if it exists. If you can fetch this, and SSH is accessible over the network from your host, then you have pretty much escalated to where command execution would have got you with a much more interactive session:</p>
 <div class="code-block-wrapper">
@@ -1100,10 +1104,12 @@ Time.Estimated...:<span class="w"> </span>Thu<span class="w"> </span>Nov<span cl
 </code></pre></div>
 </div>
 
-<p>Now with the <code>SYS</code> credentials in hand, you could try to log in with that account remotely. The offsets above might need to be tweaked depending on your <code>orapw</code> file and which accounts are in it. You can use <code>xxd</code> to look around and find either the 10g, 11g, or 12c variations. Hashcat can do all of these hash types, the modes are below:
-- Oracle 7+: <code>-m 3100</code>
-- Oracle 11+: <code>-m 112</code>
-- Oracle 12+: <code>-m 12300</code></p>
+<p>Now with the <code>SYS</code> credentials in hand, you could try to log in with that account remotely. The offsets above might need to be tweaked depending on your <code>orapw</code> file and which accounts are in it. You can use <code>xxd</code> to look around and find either the 10g, 11g, or 12c variations. Hashcat can do all of these hash types, the modes are below:</p>
+<ul>
+<li>Oracle 7+: <code>-m 3100</code></li>
+<li>Oracle 11+: <code>-m 112</code></li>
+<li>Oracle 12+: <code>-m 12300</code></li>
+</ul>
 <blockquote>
 <p>Often times in production environments, these powerful accounts are not allowed to remotely connect. If you are able to remote in as SYSDBA, it is a configuration mistake that can be quite costly and should be pointed out.</p>
 </blockquote>
@@ -1194,18 +1200,22 @@ Recovered........:<span class="w"> </span><span class="m">172</span>/196<span cl
 </div>
 
 <h2 id="command-execution">Command Execution<a href="#command-execution" class="heading-anchor" aria-label="Link to this section">#</a></h2>
-<p>Alright, finally time for the most fun part. As seen from above, you may not even need to use these modules to fully compromise the database. The modules that allow command execution are as follows:
-- <a href="https://github.com/quentinhardy/odat/wiki/dbmsscheduler"><strong>dbmsscheduler</strong></a>: This module can be used to execute system commands on the database server. You can also get a reverse shell built-in to the module.
-- <a href="https://github.com/quentinhardy/odat/wiki/java"><strong>java</strong></a>: This module can be used to execute system commands on the database server. Can get a pseudo shell or reverse shell built-in to the module.
-- <a href="https://github.com/quentinhardy/odat/wiki/oradbg"><strong>oradbg</strong></a>: This module can be used to execute system commands on the database server.</p>
+<p>Alright, finally time for the most fun part. As seen from above, you may not even need to use these modules to fully compromise the database. The modules that allow command execution are as follows:</p>
+<ul>
+<li><a href="https://github.com/quentinhardy/odat/wiki/dbmsscheduler"><strong>dbmsscheduler</strong></a>: This module can be used to execute system commands on the database server. You can also get a reverse shell built-in to the module.</li>
+<li><a href="https://github.com/quentinhardy/odat/wiki/java"><strong>java</strong></a>: This module can be used to execute system commands on the database server. Can get a pseudo shell or reverse shell built-in to the module.</li>
+<li><a href="https://github.com/quentinhardy/odat/wiki/oradbg"><strong>oradbg</strong></a>: This module can be used to execute system commands on the database server.</li>
+</ul>
 <p>In practice, I have only seen users have access to DBMS Scheduler and the Java libraries. If you have <code>oradbg</code> that will work as well, but I would expect few accounts to have this. As such, I will briefly go over the other two.</p>
 <blockquote>
 <p>For any commands you are sending through these modules, you will need to use full paths as there is no PATH variable set.</p>
 </blockquote>
 <h3 id="dbms-scheduler">DBMS Scheduler<a href="#dbms-scheduler" class="heading-anchor" aria-label="Link to this section">#</a></h3>
-<p>The <code>dbmsscheduler</code> module allows you to abuse the DBMS Scheduler to create a job that contains your system command, and then run the job. However, this module has some constraints to be aware of:
-- You cannot get the output of the system command.
-- Some special characters cannot be in the arguments to the system command (such as <code>&gt;</code>).</p>
+<p>The <code>dbmsscheduler</code> module allows you to abuse the DBMS Scheduler to create a job that contains your system command, and then run the job. However, this module has some constraints to be aware of:</p>
+<ul>
+<li>You cannot get the output of the system command.</li>
+<li>Some special characters cannot be in the arguments to the system command (such as <code>&gt;</code>).</li>
+</ul>
 <blockquote>
 <p>The operating system user that runs the job is typically the <code>nobody</code> user. So while it is great to get command execution, we won't have a high-privilege user using this methodology unless we get lucky.</p>
 </blockquote>
@@ -1527,11 +1537,11 @@ SYS<span class="w">  </span>
 
 <h2 id="references">References<a href="#references" class="heading-anchor" aria-label="Link to this section">#</a></h2>
 <ul>
-<li>ODAT and the ODAT Wiki: https://github.com/quentinhardy/odat and https://github.com/quentinhardy/odat/wiki</li>
-<li>Pyenv quick start: https://www.kali.org/docs/general-use/using-eol-python-versions/</li>
-<li>Oracle Docs: https://docs.oracle.com</li>
-<li>Article on cracking Oracle password files: https://laurent-leturgez.com/2017/12/15/brute-forcing-the-oracle-password-file/</li>
-<li>Hashcat Example Hashes: https://hashcat.net/wiki/doku.php?id=example_hashes</li>
+<li>ODAT and the ODAT Wiki: <a href="https://github.com/quentinhardy/odat">https://github.com/quentinhardy/odat</a> and <a href="https://github.com/quentinhardy/odat/wiki">https://github.com/quentinhardy/odat/wiki</a></li>
+<li>Pyenv quick start: <a href="https://www.kali.org/docs/general-use/using-eol-python-versions/">https://www.kali.org/docs/general-use/using-eol-python-versions/</a></li>
+<li>Oracle Docs: <a href="https://docs.oracle.com">https://docs.oracle.com</a></li>
+<li>Article on cracking Oracle password files: <a href="https://laurent-leturgez.com/2017/12/15/brute-forcing-the-oracle-password-file/">https://laurent-leturgez.com/2017/12/15/brute-forcing-the-oracle-password-file/</a></li>
+<li>Hashcat Example Hashes: <a href="https://hashcat.net/wiki/doku.php?id=example_hashes">https://hashcat.net/wiki/doku.php?id=example_hashes</a></li>
 </ul>
 <hr />
 <p><em>P.S. - If you are still reading this and are a real human, I appreciate you taking the time to visit and read my blog.</em></p>

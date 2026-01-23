@@ -665,6 +665,7 @@ python3 odat.py privesc -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUS
 
 ## File Read/Write/Delete
 The following modules allow you to either read, write, or delete files, and are extremely useful in privilege escalating usually. All the methods are "blind" so you need to know the full paths of where you are reading/writing.
+
 - [**ctxsys**](https://github.com/quentinhardy/odat/wiki/ctxsys): This module can be used to download a file stored on the database server.
 - [**dbmsadvisor**](https://github.com/quentinhardy/odat/wiki/dbmsadvisor): This module can be used to upload a file on the database server.
 - [**dbmslob**](https://github.com/quentinhardy/odat/wiki/dbmslob): This module can be used to download files on the database server.
@@ -768,6 +769,7 @@ ebsdb:/u01/install/APPS/19.0.0:N
 ```
 
 So now we have the SIDs of the database, and the home directory file paths which is typically what the `$ORACLE_HOME` environment variable is set to. There are many files that are helpful you could go grab now at this point within the Oracle environment, which I won't showcase fully, but here are some common ones (`$ORACLE_HOME` in this case is `/u01/install/APPS/19.0.0`):
+
 - `$ORACLE_HOME/network/admin/listener.ora`: Definition for database listener
 - `$ORACLE_HOME/network/admin/sqlnet.ora`: Definition for CDB which has the location for the `IFILE`.
 - `$ORACLE_HOME/network/admin/tnsnames.ora`: Definition for a database, has TNS connection strings and the aliases they map to.
@@ -906,6 +908,7 @@ Time.Estimated...: Thu Nov 27 03:07:42 2025 (0 secs)
 ```
 
 Now with the `SYS` credentials in hand, you could try to log in with that account remotely. The offsets above might need to be tweaked depending on your `orapw` file and which accounts are in it. You can use `xxd` to look around and find either the 10g, 11g, or 12c variations. Hashcat can do all of these hash types, the modes are below:
+
 - Oracle 7+: `-m 3100`
 - Oracle 11+: `-m 112`
 - Oracle 12+: `-m 12300`
@@ -991,6 +994,7 @@ Recovered........: 172/196 (87.76%) Digests (total), 172/196 (87.76%) Digests (n
 
 ## Command Execution
 Alright, finally time for the most fun part. As seen from above, you may not even need to use these modules to fully compromise the database. The modules that allow command execution are as follows:
+
 - [**dbmsscheduler**](https://github.com/quentinhardy/odat/wiki/dbmsscheduler): This module can be used to execute system commands on the database server. You can also get a reverse shell built-in to the module.
 - [**java**](https://github.com/quentinhardy/odat/wiki/java): This module can be used to execute system commands on the database server. Can get a pseudo shell or reverse shell built-in to the module.
 - [**oradbg**](https://github.com/quentinhardy/odat/wiki/oradbg): This module can be used to execute system commands on the database server.
@@ -1001,6 +1005,7 @@ In practice, I have only seen users have access to DBMS Scheduler and the Java l
 
 ### DBMS Scheduler
 The `dbmsscheduler` module allows you to abuse the DBMS Scheduler to create a job that contains your system command, and then run the job. However, this module has some constraints to be aware of:
+
 - You cannot get the output of the system command.
 - Some special characters cannot be in the arguments to the system command (such as `>`).
 
@@ -1283,11 +1288,11 @@ def isWorkingTnsListener(self):
 ```
 
 ## References
-- ODAT and the ODAT Wiki: https://github.com/quentinhardy/odat and https://github.com/quentinhardy/odat/wiki
-- Pyenv quick start: https://www.kali.org/docs/general-use/using-eol-python-versions/
-- Oracle Docs: https://docs.oracle.com
-- Article on cracking Oracle password files: https://laurent-leturgez.com/2017/12/15/brute-forcing-the-oracle-password-file/
-- Hashcat Example Hashes: https://hashcat.net/wiki/doku.php?id=example_hashes
+- ODAT and the ODAT Wiki: [https://github.com/quentinhardy/odat](https://github.com/quentinhardy/odat) and [https://github.com/quentinhardy/odat/wiki](https://github.com/quentinhardy/odat/wiki)
+- Pyenv quick start: [https://www.kali.org/docs/general-use/using-eol-python-versions/](https://www.kali.org/docs/general-use/using-eol-python-versions/)
+- Oracle Docs: [https://docs.oracle.com](https://docs.oracle.com)
+- Article on cracking Oracle password files: [https://laurent-leturgez.com/2017/12/15/brute-forcing-the-oracle-password-file/](https://laurent-leturgez.com/2017/12/15/brute-forcing-the-oracle-password-file/)
+- Hashcat Example Hashes: [https://hashcat.net/wiki/doku.php?id=example_hashes](https://hashcat.net/wiki/doku.php?id=example_hashes)
 
 
 ---
