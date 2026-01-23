@@ -1,3 +1,11 @@
+---
+title: "Oracle TNS Listeners: A Practical Attack Path"
+slug: "oracle-database-testing"
+date: "11/27/2025"
+description: "A walkthrough of my general methodology testing Oracle TNS listeners."
+tags: ["oracle", "database", "penetration-testing", "odat", "privilege-escalation", "internal-network"]
+---
+
 # Oracle TNS Listeners: A Practical Attack Path
 In this post, I'll walk through my standard methodology and attack path for testing Oracle Databases via their TNS Listeners. Whether you're encountering these for the first time or looking to refine your approach, I hope you'll find something useful here. This guide focuses on attacking TNS listeners running on Linux systems. While they can run on Windows Servers, I rarely encounter that in practice. This methodology can be used for Windows Servers as well, but file paths, module usages, and other differences will need to be adjusted accordingly.
 

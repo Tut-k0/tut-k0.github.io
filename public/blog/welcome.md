@@ -1,3 +1,11 @@
+---
+title: "Welcome to My Corner of the Internet"
+slug: "welcome"
+date: "09/30/2025"
+description: "An introduction to this blog and what you can expect - CTF writeups, tool development, security research, and technical notes from an offensive security engineer."
+tags: ["meta", "introduction"]
+---
+
 # Welcome to My Corner of the Internet
 
 After years of meaning to start documenting my work, I'm finally pulling the trigger on this blog. If you're reading this, welcome! I'm David, an Offensive Security Engineer who spends most days breaking into things (legally, I promise) and occasionally building tools to make that process easier.
@@ -46,11 +54,13 @@ gobuster dir -u http://target.local -w wordlist.txt
 ### Lists and Organization
 
 **Key Findings:**
+
 - Port 22: SSH (OpenSSH 8.2)
 - Port 80: HTTP (Apache 2.4.41)
 - Port 443: HTTPS with valid cert
 
 **Steps to Reproduce:**
+
 1. Navigate to `/admin` endpoint
 2. Intercept request with Burp Suite
 3. Modify the `role` parameter
