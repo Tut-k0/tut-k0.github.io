@@ -13,7 +13,6 @@
     <meta property="og:description" content="An introduction to this blog and what you can expect - CTF writeups, tool development, security research, and technical notes from an offensive security engineer.">
     
     <link rel="stylesheet" href="../../css/styles.css">
-    <link rel="stylesheet" href="../../css/syntax.css">
     <link rel="stylesheet" href="../../css/post.css">
     <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
     
@@ -75,7 +74,7 @@
                     <time datetime="09/30/2025">09/30/2025</time>
                     <span class="meta-separator">&bull;</span>
                     <span class="reading-time">2 min read</span>
-                    <span class="post-tags">meta • introduction</span>
+                    <span class="post-tags">meta &bull; introduction</span>
                 </div>
             </header>
             
@@ -103,13 +102,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
 <span class="copy-text">Copy</span>
 </button>
-<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">simple_example</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Just showing off syntax highlighting&quot;&quot;&quot;</span>
-    <span class="n">vulnerabilities</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SQLi&quot;</span><span class="p">,</span> <span class="s2">&quot;XSS&quot;</span><span class="p">,</span> <span class="s2">&quot;CSRF&quot;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">vuln</span> <span class="ow">in</span> <span class="n">vulnerabilities</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Testing for </span><span class="si">{</span><span class="n">vuln</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">&quot;All checks complete&quot;</span>
-</code></pre></div>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#F97583">def</span><span style="color:#B392F0"> simple_example</span><span style="color:#E1E4E8">():</span></span>
+<span class="line"><span style="color:#9ECBFF">    """Just showing off syntax highlighting"""</span></span>
+<span class="line"><span style="color:#E1E4E8">    vulnerabilities </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">"SQLi"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"XSS"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"CSRF"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> vuln </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> vulnerabilities:</span></span>
+<span class="line"><span style="color:#79B8FF">        print</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">f</span><span style="color:#9ECBFF">"Testing for </span><span style="color:#79B8FF">{</span><span style="color:#E1E4E8">vuln</span><span style="color:#79B8FF">}</span><span style="color:#9ECBFF">..."</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#9ECBFF"> "All checks complete"</span><span style="color:#E1E4E8">
+</span></span></code></pre>
 </div>
 
 <h3 id="command-examples">Command Examples<a href="#command-examples" class="heading-anchor" aria-label="Link to this section">#</a></h3>
@@ -118,10 +117,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
 <span class="copy-text">Copy</span>
 </button>
-<div class="codehilite"><pre><span></span><code><span class="c1"># Basic enumeration commands</span>
-nmap<span class="w"> </span>-sV<span class="w"> </span>-sC<span class="w"> </span>target.local
-gobuster<span class="w"> </span>dir<span class="w"> </span>-u<span class="w"> </span>http://target.local<span class="w"> </span>-w<span class="w"> </span>wordlist.txt
-</code></pre></div>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#6A737D"># Basic enumeration commands</span></span>
+<span class="line"><span style="color:#B392F0">nmap</span><span style="color:#79B8FF"> -sV</span><span style="color:#79B8FF"> -sC</span><span style="color:#9ECBFF"> target.local</span></span>
+<span class="line"><span style="color:#B392F0">gobuster</span><span style="color:#9ECBFF"> dir</span><span style="color:#79B8FF"> -u</span><span style="color:#9ECBFF"> http://target.local</span><span style="color:#79B8FF"> -w</span><span style="color:#9ECBFF"> wordlist.txt
+</span></span></code></pre>
 </div>
 
 <h3 id="lists-and-organization">Lists and Organization<a href="#lists-and-organization" class="heading-anchor" aria-label="Link to this section">#</a></h3>

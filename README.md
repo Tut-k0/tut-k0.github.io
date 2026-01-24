@@ -1,11 +1,11 @@
 # David Chandler - Personal Site
 
-Static personal website with integrated blog. No frameworks, just simple HTML/CSS/JS with a lightweight Python build step for the blog.
+Static personal website with integrated blog. No frameworks, just simple HTML/CSS/JS with a lightweight Python + Node.js build step for the blog.
 
 ## Technologies Used
 
-- **Python + Markdown** - Build-time markdown to HTML conversion
-- **Pygments** - Syntax highlighting (Monokai theme)
+- **Python + Markdown** - Build-time Markdown to HTML conversion
+- **Shiki** - VS Code-quality syntax highlighting (via Node.js)
 - Pure HTML/CSS/JS - No frontend frameworks
 - GitHub Actions - Automated deployment
 - GitHub Pages - Free hosting
@@ -44,11 +44,20 @@ Your content here...
 ```
 
 3. **Build locally** to preview changes:
-   - `pip install -r requirements.txt`
-   - `python build.py`
+   ```bash
+   # Install dependencies (first time only)
+   npm install
+   pip install -r requirements.txt
+   
+   # Build the blog
+   python build.py
+   ```
+
+   This generates:
+   - `public/blog/posts/*.html` - Static HTML posts with Shiki-highlighted code
+   - `public/blog/index.json` - Auto-generated blog index
 
 4. **Commit and push** - Merge new branch to deploy to GitHub Pages.
-
 
 ### Frontmatter Fields
 
