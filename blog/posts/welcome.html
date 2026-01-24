@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to My Corner of the Internet - David Chandler</title>
+    <meta name="description" content="An introduction to this blog and what you can expect - CTF writeups, tool development, security research, and technical notes from an offensive security engineer.">
+    <meta name="author" content="David Chandler">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Welcome to My Corner of the Internet">
+    <meta property="og:description" content="An introduction to this blog and what you can expect - CTF writeups, tool development, security research, and technical notes from an offensive security engineer.">
+    
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../css/post.css">
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    
+    <!-- JetBrains Mono for code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-container">
+        <a href="../../index.html" class="nav-brand">DC</a>
+        <div class="nav-links">
+            <a href="../../index.html">Home</a>
+            <a href="../../experience.html">Experience</a>
+            <a href="../../projects.html">Projects</a>
+            <a href="../../blog.html" class="active">Blog</a>
+            <a href="../../contact.html">Contact</a>
+        </div>
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </div>
+</nav>
+
+<!-- Reading progress bar -->
+<div class="reading-progress" id="reading-progress"></div>
+
+<!-- Table of Contents - Fixed sidebar, outside main content flow -->
+<nav class="toc" id="toc">
+<div class="toc-header">
+<span class="toc-title">Contents</span>
+<button class="toc-toggle" onclick="toggleToc()" aria-label="Toggle table of contents">
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</button>
+</div>
+<ul class="toc-list">
+<li class="toc-level-1"><a href="#welcome-to-my-corner-of-the-internet">Welcome to My Corner of the Internet</a></li>
+<li class="toc-level-2"><a href="#what-youll-find-here">What You&#x27;ll Find Here</a></li>
+<li class="toc-level-2"><a href="#why-another-security-blog">Why Another Security Blog?</a></li>
+<li class="toc-level-2"><a href="#quick-example-of-what-to-expect">Quick Example of What to Expect</a></li>
+<li class="toc-level-3"><a href="#code-blocks">Code Blocks</a></li>
+<li class="toc-level-3"><a href="#command-examples">Command Examples</a></li>
+<li class="toc-level-3"><a href="#lists-and-organization">Lists and Organization</a></li>
+<li class="toc-level-3"><a href="#images-and-screenshots">Images and Screenshots</a></li>
+<li class="toc-level-2"><a href="#whats-next">What&#x27;s Next?</a></li>
+</ul></nav>
+
+<div class="post-layout">
+    <main class="post-container">
+        <a href="../../blog.html" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Blog
+        </a>
+
+        <article class="post-article">
+            <header class="post-header">
+                <div class="post-meta">
+                    <time datetime="09/30/2025">09/30/2025</time>
+                    <span class="meta-separator">&bull;</span>
+                    <span class="reading-time">2 min read</span>
+                    <span class="post-tags">meta &bull; introduction</span>
+                </div>
+            </header>
+            
+            <div class="blog-post-content">
+                <h1 id="welcome-to-my-corner-of-the-internet">Welcome to My Corner of the Internet<a href="#welcome-to-my-corner-of-the-internet" class="heading-anchor" aria-label="Link to this section">#</a></h1>
+<p>After years of meaning to start documenting my work, I'm finally pulling the trigger on this blog. If you're reading this, welcome! I'm David, an Offensive Security Engineer who spends most days breaking into things (legally, I promise) and occasionally building tools to make that process easier.</p>
+<h2 id="what-youll-find-here">What You'll Find Here<a href="#what-youll-find-here" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>This blog will be a mix of:</p>
+<ul>
+<li><strong>CTF Writeups</strong> - Hack The Box, TryHackMe, and other challenges</li>
+<li><strong>Tool Development</strong> - Custom security tools and automation scripts</li>
+<li><strong>Security Research</strong> - Vulnerability analysis and exploit development</li>
+<li><strong>Technical Notes</strong> - Things I learn and want to remember later</li>
+<li><strong>Miscellaneous</strong> - Random one-off projects or things that don't quite fit in the above categories</li>
+</ul>
+<p>Basically, if I spend more than a few hours figuring something out, it's probably worth writing down.</p>
+<h2 id="why-another-security-blog">Why Another Security Blog?<a href="#why-another-security-blog" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>Good question. The internet doesn't exactly lack security blogs, but I've always found that writing things down helps me understand them better. Plus, I hope that others can learn from my mistakes and find useful information.</p>
+<p>Think of this as my public notebook - less polished than a formal writeup, more useful than my scattered notes in Obsidian.</p>
+<h2 id="quick-example-of-what-to-expect">Quick Example of What to Expect<a href="#quick-example-of-what-to-expect" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>Here's how I'll typically structure posts with code examples and technical details:</p>
+<h3 id="code-blocks">Code Blocks<a href="#code-blocks" class="heading-anchor" aria-label="Link to this section">#</a></h3>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#F97583">def</span><span style="color:#B392F0"> simple_example</span><span style="color:#E1E4E8">():</span></span>
+<span class="line"><span style="color:#9ECBFF">    """Just showing off syntax highlighting"""</span></span>
+<span class="line"><span style="color:#E1E4E8">    vulnerabilities </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span><span style="color:#9ECBFF">"SQLi"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"XSS"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"CSRF"</span><span style="color:#E1E4E8">]</span></span>
+<span class="line"><span style="color:#F97583">    for</span><span style="color:#E1E4E8"> vuln </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> vulnerabilities:</span></span>
+<span class="line"><span style="color:#79B8FF">        print</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">f</span><span style="color:#9ECBFF">"Testing for </span><span style="color:#79B8FF">{</span><span style="color:#E1E4E8">vuln</span><span style="color:#79B8FF">}</span><span style="color:#9ECBFF">..."</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#9ECBFF"> "All checks complete"</span><span style="color:#E1E4E8">
+</span></span></code></pre>
+</div>
+
+<h3 id="command-examples">Command Examples<a href="#command-examples" class="heading-anchor" aria-label="Link to this section">#</a></h3>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#6A737D"># Basic enumeration commands</span></span>
+<span class="line"><span style="color:#B392F0">nmap</span><span style="color:#79B8FF"> -sV</span><span style="color:#79B8FF"> -sC</span><span style="color:#9ECBFF"> target.local</span></span>
+<span class="line"><span style="color:#B392F0">gobuster</span><span style="color:#9ECBFF"> dir</span><span style="color:#79B8FF"> -u</span><span style="color:#9ECBFF"> http://target.local</span><span style="color:#79B8FF"> -w</span><span style="color:#9ECBFF"> wordlist.txt
+</span></span></code></pre>
+</div>
+
+<h3 id="lists-and-organization">Lists and Organization<a href="#lists-and-organization" class="heading-anchor" aria-label="Link to this section">#</a></h3>
+<p><strong>Key Findings:</strong></p>
+<ul>
+<li>Port 22: SSH (OpenSSH 8.2)</li>
+<li>Port 80: HTTP (Apache 2.4.41)</li>
+<li>Port 443: HTTPS with valid cert</li>
+</ul>
+<p><strong>Steps to Reproduce:</strong></p>
+<ol>
+<li>Navigate to <code>/admin</code> endpoint</li>
+<li>Intercept request with Burp Suite</li>
+<li>Modify the <code>role</code> parameter</li>
+<li>Profit</li>
+</ol>
+<h3 id="images-and-screenshots">Images and Screenshots<a href="#images-and-screenshots" class="heading-anchor" aria-label="Link to this section">#</a></h3>
+<p>When relevant, I'll include screenshots and diagrams.</p>
+<p><img alt="Example visualization" src="../../images/example.gif" /></p>
+<blockquote>
+<p>Pro tip: Always document and take screenshots during engagements. You'll thank yourself later when writing the report.</p>
+</blockquote>
+<h2 id="whats-next">What's Next?<a href="#whats-next" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>I've got a backlog of things to write up, some tool development posts in the works, maybe some HTB machines, and notes from recent exercises. Expect a mix of technical depth and practical takeaways.</p>
+<p>If you're interested in offensive security, automation, or just breaking things in creative ways, stick around. I'll try to keep things interesting and actually useful.</p>
+<p><strong>Stay tuned for more posts soon.</strong> In the meantime, feel free to check out my <a href="/projects.html">projects</a> or connect with me on <a href="https://github.com/Tut-k0">GitHub</a>.</p>
+<hr />
+<p><em>P.S. - If you are still reading this and are a real human, I appreciate you taking the time to visit and read my blog.</em></p>
+            </div>
+        </article>
+        
+        <footer class="post-footer">
+            <div class="post-nav">
+                <a href="../../blog.html" class="btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    All Posts
+                </a>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<footer class="footer">
+    <p>Built without a framework because we don't need the bloat.</p>
+</footer>
+
+<script>
+// Copy code functionality
+function copyCode(button) {
+    const wrapper = button.parentElement;
+    const pre = wrapper.querySelector('pre');
+    const code = pre.textContent;
+    
+    navigator.clipboard.writeText(code).then(() => {
+        const textSpan = button.querySelector('.copy-text');
+        const originalText = textSpan.textContent;
+        textSpan.textContent = 'Copied!';
+        button.classList.add('copied');
+        
+        setTimeout(() => {
+            textSpan.textContent = originalText;
+            button.classList.remove('copied');
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+    });
+}
+
+// ToC toggle functionality
+function toggleToc() {
+    const toc = document.getElementById('toc');
+    toc.classList.toggle('collapsed');
+}
+
+// Mobile menu toggle
+function toggleMobileMenu() {
+    const navLinks = document.querySelector('.nav-links');
+    navLinks.classList.toggle('mobile-open');
+}
+
+// Reading progress bar
+function updateReadingProgress() {
+    const article = document.querySelector('.post-article');
+    const progressBar = document.getElementById('reading-progress');
+    
+    if (!article || !progressBar) return;
+    
+    const articleRect = article.getBoundingClientRect();
+    const articleTop = window.scrollY + articleRect.top;
+    const articleHeight = articleRect.height;
+    const windowHeight = window.innerHeight;
+    
+    const scrolled = window.scrollY - articleTop + windowHeight * 0.3;
+    const progress = Math.min(Math.max(scrolled / articleHeight * 100, 0), 100);
+    
+    progressBar.style.width = `${progress}%`;
+}
+
+// Active ToC highlighting
+function updateActiveTocItem() {
+    const headings = document.querySelectorAll('.blog-post-content h1[id], .blog-post-content h2[id], .blog-post-content h3[id], .blog-post-content h4[id]');
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    
+    if (!headings.length || !tocLinks.length) return;
+    
+    let activeId = null;
+    const scrollPos = window.scrollY + 100;
+    
+    headings.forEach(heading => {
+        if (heading.offsetTop <= scrollPos) {
+            activeId = heading.id;
+        }
+    });
+    
+    tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${activeId}`) {
+            link.classList.add('active');
+        }
+    });
+}
+
+// Smooth scroll for ToC links
+document.querySelectorAll('.toc-list a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').slice(1);
+        const targetElement = document.getElementById(targetId);
+        
+        if (targetElement) {
+            const offset = 80; // Account for sticky nav
+            const targetPosition = targetElement.offsetTop - offset;
+            
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+            
+            // Update URL without triggering scroll
+            history.pushState(null, null, `#${targetId}`);
+        }
+    });
+});
+
+// Event listeners
+window.addEventListener('scroll', () => {
+    updateReadingProgress();
+    updateActiveTocItem();
+}, { passive: true });
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    updateReadingProgress();
+    updateActiveTocItem();
+    
+    // Handle direct links to anchors
+    if (window.location.hash) {
+        setTimeout(() => {
+            const targetElement = document.querySelector(window.location.hash);
+            if (targetElement) {
+                const offset = 80;
+                window.scrollTo({
+                    top: targetElement.offsetTop - offset,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
+    }
+});
+</script>
+</body>
+</html>

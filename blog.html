@@ -114,7 +114,7 @@
 
         posts.forEach(post => {
             const card = document.createElement('a');
-            card.href = `post.html?id=${post.slug}`;
+            card.href = `blog/posts/${post.file}`;
             card.className = 'blog-post-card';
 
             const tagsHtml = post.tags ?
