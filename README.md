@@ -1,12 +1,12 @@
 # David Chandler - Personal Site
 
-Static personal website with integrated blog. No build tools, no frameworks, just simple HTML/CSS/JS.
+Static personal website with integrated blog. No frameworks, just simple HTML/CSS/JS with a lightweight Python + Node.js build step for the blog.
 
 ## Technologies Used
 
-- **Marked.js** - Markdown parsing
-- **Prism.js** - Syntax highlighting
-- Pure HTML/CSS/JS - No build steps required
+- **Python + Markdown** - Build-time Markdown to HTML conversion
+- **Shiki** - VS Code-quality syntax highlighting (via Node.js)
+- Pure HTML/CSS/JS - No frontend frameworks
 - GitHub Actions - Automated deployment
 - GitHub Pages - Free hosting
 
@@ -15,60 +15,56 @@ Static personal website with integrated blog. No build tools, no frameworks, jus
 Personal site. Feel free to use the structure as inspiration, do whatever you want.
 
 
-***The rest of this README is information for me, so when I inevitably forget how to add a new blog post, I'll remember this.***
+---
 
-## Adding Blog Posts
+## Blog Workflow
 
-### Create Markdown file
+### Adding a New Blog Post
 
-Create a new `.md` file in the `public/blog/` directory. Will probably be from a direct export out of Obsidian.
-
-**Example:** `public/blog/my-ctf-writeup.md`
+1. **Create a markdown file** in `public/blog/`:
 
 ```markdown
-# HTB Machine Writeup: ExampleBox
+---
+title: "Your Post Title"
+slug: "your-post-slug"
+date: "MM/DD/YYYY"
+description: "A brief description for the blog listing and SEO."
+tags: ["tag1", "tag2", "tag3"]
+---
 
-Quick writeup of an interesting HTB machine.
+# Your Post Title
 
-## Enumeration
-
-Started with a basic nmap scan:
-
-\`\`\`bash
-nmap -sV -sC 10.10.10.100
-\`\`\`
-
-## Images
-
-Include images from the images folder:
-
-![Screenshot](../images/screenshot.png)
+Your content here...
 ```
 
-### Update the blog index
-
-Add an entry to `public/blog/index.json`:
-
-```json
-{
-  "title": "HTB Machine Writeup: ExampleBox",
-  "slug": "my-ctf-writeup",
-  "file": "my-ctf-writeup.md",
-  "date": "10/20/2025",
-  "description": "Quick writeup of an interesting HTB machine with web exploitation.",
-  "tags": ["htb", "ctf", "web"]
-}
-```
-
-### Add images (if any)
-
-Drop image files in `public/images/` and update the references to them in Markdown:
+2. **Add images** (if any) to `public/images/` and reference them:
 
 ```markdown
 ![Alt text](../images/your-image.png)
 ```
 
-Or in HTML pages:
-```html
-<img src="images/your-image.png" alt="Description">
-```
+3. **Build locally** to preview changes:
+   ```bash
+   # Install dependencies (first time only)
+   npm install
+   pip install -r requirements.txt
+   
+   # Build the blog
+   python build.py
+   ```
+
+   This generates:
+   - `public/blog/posts/*.html` - Static HTML posts with Shiki-highlighted code
+   - `public/blog/index.json` - Auto-generated blog index
+
+4. **Commit and push** - Merge new branch to deploy to GitHub Pages.
+
+### Frontmatter Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `title` | Yes | Post title (used in page title and ToC) |
+| `slug` | No | URL slug (defaults to filename) |
+| `date` | Yes | Publication date (MM/DD/YYYY format) |
+| `description` | Yes | Brief description for listings and SEO |
+| `tags` | No | Array of tags for filtering |

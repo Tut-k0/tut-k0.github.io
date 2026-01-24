@@ -1,0 +1,8 @@
+{
+  "name": "blog-build",
+  "private": true,
+  "description": "Blog build dependencies",
+  "dependencies": {
+    "shiki": "^3.0.0"
+  }
+}
