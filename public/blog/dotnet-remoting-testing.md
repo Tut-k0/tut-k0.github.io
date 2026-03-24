@@ -8,7 +8,7 @@ tags: [".net", "remoting", "deserialization", "penetration-testing", "internal-n
 
 # Testing .NET Remoting Services in Offensive Security Work
 
-This post covers my general methodology for identifying and exploiting .NET Remoting services during penetration tests. These are not something you run into every single day, but when you do stumble across one, knowing what to do with it can be the difference between a dead end and a solid finding. I built a tool called [RemotingReloaded](https://github.com/Tut-k0/RemotingReloaded) to make the common case a lot less painful, and this post walks through how I use it along with the broader attack path from initial identification all the way through to the deeper techniques for harder targets.
+This post covers my general methodology for identifying and exploiting .NET Remoting services during penetration tests. These are not something you run into every single day, but when you do stumble across one, knowing what to do with it can be the difference between a dead end and a solid finding. I built a tool called [RemotingReloaded](https://github.com/Tut-k0/remoting-reloaded) to make the common case a lot less painful, and this post walks through how I use it along with the broader attack path from initial identification all the way through to the deeper techniques for harder targets.
 
 ## What is .NET Remoting?
 
@@ -45,7 +45,7 @@ PORT     STATE SERVICE            VERSION
 
 Before this tool existed, testing one of these services was kind of a chore. You'd need to be on a Windows host, have .NET Framework installed, build or grab [ExploitRemotingService](https://github.com/tyranid/ExploitRemotingService), potentially set up [RogueRemotingServer](https://github.com/codewhitesec/RogueRemotingServer) separately, use [ysoserial.net](https://github.com/pwntester/ysoserial.net) to generate gadget chain payloads, and then piece it all together while reading through documentation and blog posts to figure out what to actually throw at the target. For HTTP targets, you'd be adding the NCC Group research on top of that.
 
-[RemotingReloaded](https://github.com/Tut-k0/RemotingReloaded) handles the common case for you, cross-platform, with no .NET Framework dependency and no external tooling required. It generates payloads internally, runs on Linux, macOS, and Windows via .NET 8, and gives you feedback on what happened so you know where you stand and what to try next.
+[RemotingReloaded](https://github.com/Tut-k0/remoting-reloaded) handles the common case for you, cross-platform, with no .NET Framework dependency and no external tooling required. It generates payloads internally, runs on Linux, macOS, and Windows via .NET 8, and gives you feedback on what happened so you know where you stand and what to try next.
 
 ### Attack Modes
 
@@ -59,7 +59,7 @@ The tool supports three attack chains under the hood:
 
 ### Basic Usage
 
-Grab a prebuilt binary from the [Releases](https://github.com/Tut-k0/RemotingReloaded/releases) page for your platform or build from source with the .NET 8 SDK. Usage is straightforward:
+Grab a prebuilt binary from the [Releases](https://github.com/Tut-k0/remoting-reloaded/releases) page for your platform or build from source with the .NET 8 SDK. Usage is straightforward:
 
 ```bash
 # Linux / macOS
@@ -184,7 +184,7 @@ If you can't get the assemblies but you have some context on the application, yo
 - If you know the organization's namespace convention (something like `Orgname.ProductName.ServiceType`), you can use that as a starting point and build variations from it
 - Config files and source code on the target or elsewhere in the environment may reference the URI indirectly through connection strings or client configuration
 
-The scripts in the [RemotingReloaded/Scripts](https://github.com/Tut-k0/RemotingReloaded/tree/main/Scripts) directory are what I used to generate the built-in wordlist. They scrape GitHub for `.NET Remoting` config files and C# source registrations. You can run them yourself to pull a fresh extended wordlist, and they also give you a good sense of what naming patterns actually appear in the wild.
+The scripts in the [RemotingReloaded/Scripts](https://github.com/Tut-k0/remoting-reloaded/tree/main/Scripts) directory are what I used to generate the built-in wordlist. They scrape GitHub for `.NET Remoting` config files and C# source registrations. You can run them yourself to pull a fresh extended wordlist, and they also give you a good sense of what naming patterns actually appear in the wild.
 
 ```bash
 # Merge both script outputs into a single wordlist
