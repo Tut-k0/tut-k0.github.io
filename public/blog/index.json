@@ -1,5 +1,19 @@
 [
   {
+    "title": "Testing .NET Remoting Services in Offensive Security Work",
+    "slug": "dotnet-remoting-testing",
+    "file": "dotnet-remoting-testing.html",
+    "date": "03/24/2026",
+    "description": "A walkthrough of my general methodology for identifying and exploiting .NET Remoting services during offensive security engagements.",
+    "tags": [
+      ".net",
+      "remoting",
+      "deserialization",
+      "penetration-testing",
+      "internal-network"
+    ]
+  },
+  {
     "title": "Oracle TNS Listeners: A Practical Attack Path",
     "slug": "oracle-database-testing",
     "file": "oracle-database-testing.html",
