@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing .NET Remoting Services in Offensive Security Work - David Chandler</title>
+    <meta name="description" content="A walkthrough of my general methodology for identifying and exploiting .NET Remoting services during offensive security engagements.">
+    <meta name="author" content="David Chandler">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Testing .NET Remoting Services in Offensive Security Work">
+    <meta property="og:description" content="A walkthrough of my general methodology for identifying and exploiting .NET Remoting services during offensive security engagements.">
+    
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../css/post.css">
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    
+    <!-- JetBrains Mono for code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-container">
+        <a href="../../index.html" class="nav-brand">DC</a>
+        <div class="nav-links">
+            <a href="../../index.html">Home</a>
+            <a href="../../experience.html">Experience</a>
+            <a href="../../projects.html">Projects</a>
+            <a href="../../blog.html" class="active">Blog</a>
+            <a href="../../contact.html">Contact</a>
+        </div>
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </div>
+</nav>
+
+<!-- Reading progress bar -->
+<div class="reading-progress" id="reading-progress"></div>
+
+<!-- Table of Contents - Fixed sidebar, outside main content flow -->
+<nav class="toc" id="toc">
+<div class="toc-header">
+<span class="toc-title">Contents</span>
+<button class="toc-toggle" onclick="toggleToc()" aria-label="Toggle table of contents">
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</button>
+</div>
+<ul class="toc-list">
+<li class="toc-level-1"><a href="#testing-net-remoting-services-in-offensive-security-work">Testing .NET Remoting Services in Offensive Security Work</a></li>
+<li class="toc-level-2"><a href="#what-is-net-remoting">What is .NET Remoting?</a></li>
+<li class="toc-level-2"><a href="#identifying-net-remoting-services">Identifying .NET Remoting Services</a></li>
+<li class="toc-level-2"><a href="#exploiting-with-remotingreloaded">Exploiting with RemotingReloaded</a></li>
+<li class="toc-level-3"><a href="#attack-modes">Attack Modes</a></li>
+<li class="toc-level-3"><a href="#basic-usage">Basic Usage</a></li>
+<li class="toc-level-3"><a href="#service-uri-discovery">Service URI Discovery</a></li>
+<li class="toc-level-2"><a href="#finding-the-service-uri">Finding the Service URI</a></li>
+<li class="toc-level-3"><a href="#disassembling-the-application-assemblies">Disassembling the Application Assemblies</a></li>
+<li class="toc-level-3"><a href="#building-your-own-wordlist">Building Your Own Wordlist</a></li>
+<li class="toc-level-2"><a href="#typefilterlevel--low">TypeFilterLevel = Low</a></li>
+<li class="toc-level-2"><a href="#secure-tcp-channel">Secure TCP Channel</a></li>
+<li class="toc-level-2"><a href="#the-internet-exposed-attack-surface">The Internet-Exposed Attack Surface</a></li>
+<li class="toc-level-1"><a href="#conclusion">Conclusion</a></li>
+<li class="toc-level-2"><a href="#references">References</a></li>
+</ul></nav>
+
+<div class="post-layout">
+    <main class="post-container">
+        <a href="../../blog.html" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Blog
+        </a>
+
+        <article class="post-article">
+            <header class="post-header">
+                <div class="post-meta">
+                    <time datetime="03/24/2026">03/24/2026</time>
+                    <span class="meta-separator">&bull;</span>
+                    <span class="reading-time">17 min read</span>
+                    <span class="post-tags">.net &bull; remoting &bull; deserialization &bull; penetration-testing &bull; internal-network</span>
+                </div>
+            </header>
+            
+            <div class="blog-post-content">
+                <h1 id="testing-net-remoting-services-in-offensive-security-work">Testing .NET Remoting Services in Offensive Security Work<a href="#testing-net-remoting-services-in-offensive-security-work" class="heading-anchor" aria-label="Link to this section">#</a></h1>
+<p>This post covers my general methodology for identifying and exploiting .NET Remoting services during penetration tests. These are not something you run into every single day, but when you do stumble across one, knowing what to do with it can be the difference between a dead end and a solid finding. I built a tool called <a href="https://github.com/Tut-k0/RemotingReloaded">RemotingReloaded</a> to make the common case a lot less painful, and this post walks through how I use it along with the broader attack path from initial identification all the way through to the deeper techniques for harder targets.</p>
+<h2 id="what-is-net-remoting">What is .NET Remoting?<a href="#what-is-net-remoting" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>.NET Remoting was Microsoft's inter-process communication (IPC) framework introduced with .NET Framework 1.0 back in 2002. The idea was to let objects in one process communicate with objects living in another process, whether on the same machine or across a network, in a way that felt like a normal local method call to the developer. If you're familiar with Java RMI, it's a very similar concept. You have a remote object registered on a server, a client-side proxy that mirrors its interface, and the framework handles serializing method calls and return values across the wire transparently.</p>
+<p>Microsoft deprecated .NET Remoting in favor of WCF starting with .NET Framework 3.0, and it has no support at all in .NET Core or .NET 5+. Despite that, you still find it running in enterprise environments because a lot of organizations have internal applications built on .NET Framework that have never been rewritten. If the application works, nobody touches it. That's exactly where these services live.</p>
+<h2 id="identifying-net-remoting-services">Identifying .NET Remoting Services<a href="#identifying-net-remoting-services" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>Nmap has built-in probes that can identify .NET Remoting services during a service version scan. The key things to look for in scan results are:</p>
+<ul>
+<li><code>MS .NET Remoting services</code>: Standard TCP channel</li>
+<li><code>MS .NET Remoting httpd</code>: HTTP channel</li>
+<li><code>StorageCraft Image Manager</code>: Can appear when the service uses a secure (authenticated) TCP channel</li>
+<li><code>Microsoft Exchange 2010 log copier</code>: Another fingerprint that can appear with secure channel TCP services</li>
+</ul>
+<p>The last two are worth calling out specifically because they can catch you off guard. When a .NET Remoting service has a secure channel configured, the service responds a bit differently to Nmap's probes, and depending on exactly how the service responds, Nmap may report it as <code>StorageCraft Image Manager</code> or <code>Microsoft Exchange 2010 log copier</code>. If you're scanning an environment and you see either of those on a port that doesn't quite make sense for the host you're looking at, it's worth taking a closer look. You might be looking at a .NET Remoting service with authentication configured rather than whatever that label implies.</p>
+<p>A basic Nmap service version scan is all you need to start:</p>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#B392F0">nmap</span><span style="color:#79B8FF"> -sV</span><span style="color:#79B8FF"> -p-</span><span style="color:#9ECBFF"> target.example.com</span></span>
+<span class="line"><span style="color:#6A737D"># ...SNIP...</span></span>
+<span class="line"><span style="color:#B392F0">PORT</span><span style="color:#9ECBFF">     STATE</span><span style="color:#9ECBFF"> SERVICE</span><span style="color:#9ECBFF">            VERSION</span></span>
+<span class="line"><span style="color:#B392F0">8080/tcp</span><span style="color:#9ECBFF"> open</span><span style="color:#9ECBFF">  remoting</span><span style="color:#9ECBFF">           MS</span><span style="color:#9ECBFF"> .NET</span><span style="color:#9ECBFF"> Remoting</span><span style="color:#9ECBFF"> services</span></span>
+<span class="line"><span style="color:#B392F0">9001/tcp</span><span style="color:#9ECBFF"> open</span><span style="color:#9ECBFF">  storagecraft-image</span><span style="color:#9ECBFF"> StorageCraft</span><span style="color:#9ECBFF"> Image</span><span style="color:#9ECBFF"> Manager</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># ...SNIP...</span></span></code></pre>
+</div>
+
+<p>.NET Remoting services can run on any port, so a full port scan with <code>-p-</code> is your friend here. Some specific products have default ports, but custom applications can be running on any port.</p>
+<h2 id="exploiting-with-remotingreloaded">Exploiting with RemotingReloaded<a href="#exploiting-with-remotingreloaded" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>Before this tool existed, testing one of these services was kind of a chore. You'd need to be on a Windows host, have .NET Framework installed, build or grab <a href="https://github.com/tyranid/ExploitRemotingService">ExploitRemotingService</a>, potentially set up <a href="https://github.com/codewhitesec/RogueRemotingServer">RogueRemotingServer</a> separately, use <a href="https://github.com/pwntester/ysoserial.net">ysoserial.net</a> to generate gadget chain payloads, and then piece it all together while reading through documentation and blog posts to figure out what to actually throw at the target. For HTTP targets, you'd be adding the NCC Group research on top of that.</p>
+<p><a href="https://github.com/Tut-k0/RemotingReloaded">RemotingReloaded</a> handles the common case for you, cross-platform, with no .NET Framework dependency and no external tooling required. It generates payloads internally, runs on Linux, macOS, and Windows via .NET 8, and gives you feedback on what happened so you know where you stand and what to try next.</p>
+<h3 id="attack-modes">Attack Modes<a href="#attack-modes" class="heading-anchor" aria-label="Link to this section">#</a></h3>
+<p>The tool supports three attack chains under the hood:</p>
+<p><strong>ObjRef + Rogue Server (default)</strong>: Sends an ObjRef gadget to the target that points at a built-in rogue TCP server the tool spins up locally. When the target deserializes the ObjRef, it creates a RemotingProxy and phones back to your rogue server. The rogue server then delivers a TypeConfuseDelegate payload, which the target's <code>BinaryFormatter</code> deserializes and executes. This is the preferred mode because it won't potentially crash services running with <code>TypeFilterLevel = Low</code>, where a direct send could blow up the service process.</p>
+<p><strong>Direct Send (<code>--direct</code>)</strong>: Ships the TypeConfuseDelegate (TCP) or TextFormattingRunProperties (HTTP) payload directly over the remoting channel without a rogue server. Faster and simpler, but you risk crashing the service if <code>TypeFilterLevel</code> is not set to <code>Full</code>. Use with caution on production targets.</p>
+<p><strong>TextFormattingRunProperties (HTTP, direct)</strong>: A XAML ObjectDataProvider gadget wrapped in a SOAP envelope. Exploits <code>XamlReader.Parse()</code> on the target via the HTTP channel.</p>
+<h3 id="basic-usage">Basic Usage<a href="#basic-usage" class="heading-anchor" aria-label="Link to this section">#</a></h3>
+<p>Grab a prebuilt binary from the <a href="https://github.com/Tut-k0/RemotingReloaded/releases">Releases</a> page for your platform or build from source with the .NET 8 SDK. Usage is straightforward:</p>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#6A737D"># Linux / macOS</span></span>
+<span class="line"><span style="color:#B392F0">chmod</span><span style="color:#9ECBFF"> +x</span><span style="color:#9ECBFF"> RemotingReloaded-linux-x64</span></span>
+<span class="line"><span style="color:#B392F0">./RemotingReloaded-linux-x64</span><span style="color:#79B8FF"> -t</span><span style="color:#9ECBFF"> tcp://192.168.1.10:4242</span><span style="color:#79B8FF"> -c</span><span style="color:#9ECBFF"> "calc.exe"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Windows</span></span>
+<span class="line"><span style="color:#79B8FF">.</span><span style="color:#E1E4E8">\</span><span style="color:#9ECBFF">RemotingReloaded-win-x64.exe</span><span style="color:#79B8FF"> -t</span><span style="color:#9ECBFF"> tcp://192.168.1.10:4242</span><span style="color:#79B8FF"> -c</span><span style="color:#9ECBFF"> "calc.exe"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># HTTP target</span></span>
+<span class="line"><span style="color:#B392F0">./RemotingReloaded-linux-x64</span><span style="color:#79B8FF"> -t</span><span style="color:#9ECBFF"> http://192.168.1.10:8080</span><span style="color:#79B8FF"> -c</span><span style="color:#9ECBFF"> "calc.exe"</span></span></code></pre>
+</div>
+
+<p>If you already know the service URI, include it:</p>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#B392F0">./RemotingReloaded-linux-x64</span><span style="color:#79B8FF"> -t</span><span style="color:#9ECBFF"> tcp://192.168.1.10:4242/MyService</span><span style="color:#79B8FF"> -c</span><span style="color:#9ECBFF"> "calc.exe"</span></span></code></pre>
+</div>
+
+<blockquote>
+<p><strong>Note:</strong> You would obviously want to use a weaponized payload instead of <code>calc.exe</code>. I personally am a big fan of encoded PowerShell where you can get away with it.</p>
+</blockquote>
+<h3 id="service-uri-discovery">Service URI Discovery<a href="#service-uri-discovery" class="heading-anchor" aria-label="Link to this section">#</a></h3>
+<p>One of the less obvious parts of attacking these services is that .NET Remoting requires you to know the service's URI path. It's basically the registered name for the endpoint on the server side, think of it like the path component of a URL. If you don't know it, you can't reach the service.</p>
+<p>RemotingReloaded handles this automatically in two stages when no service name is provided in the target URI:</p>
+<ol>
+<li>
+<p><strong>Null URI attack</strong> (TCP only): Sends the payload without a <code>RequestUri</code> header. Some services will process the first incoming message before checking the URI, which can result in execution before you even know the correct name.</p>
+</li>
+<li>
+<p><strong>Wordlist spray</strong>: Iterates through the built-in wordlist (or a custom one via <code>--wordlist</code>) trying each service name in sequence. The built-in wordlist was generated by scraping GitHub for <code>.NET Remoting</code> configuration files and C# source registrations. The tool stops as soon as it gets a hit or exhausts the list.</p>
+</li>
+</ol>
+<p>A successful run with automatic URI discovery looks something like this:</p>
+<p><img alt="RemotingReloaded successful exploitation with URI discovery" src="../../images/remoting-1.png" /></p>
+<p>And when the tool exhausts the wordlist without finding a valid URI, you'll get output like this:</p>
+<p><img alt="RemotingReloaded service URI not found" src="../../images/remoting-2.png" /></p>
+<p>That <code>no valid service URI found</code> outcome is the tool telling you it needs more information. The built-in wordlist is compromised of open-source repos that directly plop values into configs or source code. It is not comprehensive at this point and for internal tooling may not work for you out of the box. This is an area of the tool that could be expanded on in the future. If you exhaust it, your next move is to find or guess the URI.</p>
+<h2 id="finding-the-service-uri">Finding the Service URI<a href="#finding-the-service-uri" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<h3 id="disassembling-the-application-assemblies">Disassembling the Application Assemblies<a href="#disassembling-the-application-assemblies" class="heading-anchor" aria-label="Link to this section">#</a></h3>
+<p>The most reliable way to find the service URI is to disassemble the server application itself. The URI is registered in code or configuration, so it's just sitting there waiting to be read.</p>
+<p>On internal engagements, you'd be genuinely surprised how often the server application's assemblies are sitting on an SMB share somewhere in the environment. Developers drop build artifacts, deployment packages, and application binaries on file shares all the time, and those shares are frequently readable by default domain user accounts. It's worth doing a quick pass for readable shares and checking for any <code>.dll</code> or <code>.exe</code> files related to whatever application is running on your target. If you have a foothold anywhere in the domain, this is a natural step in your enumeration.</p>
+<p>Once you have the assemblies, load them in a .NET decompiler. I use <a href="https://www.jetbrains.com/decompiler/">JetBrains dotPeek</a> but <a href="https://github.com/dnSpy/dnSpy">dnSpy</a> and <a href="https://github.com/icsharpcode/ILSpy">ILSpy</a> work just as well. You're looking for calls to <code>RemotingConfiguration.RegisterWellKnownServiceType</code>, <code>RemotingServices.Marshal</code>, <code>SetObjectUriForMarshal</code>, or <code>WellKnownServiceTypeEntry</code> constructors. The second argument to any of these is your service URI string.</p>
+<p>Here's an example of what that looks like when you find it (taken from the <a href="https://github.com/icotting/Phocalstream">PhocalStream</a> application as an example):</p>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#F97583">protected</span><span style="color:#F97583"> override</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> OnStart</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">string</span><span style="color:#E1E4E8">[] </span><span style="color:#B392F0">args</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#E1E4E8">	AppDomain.CurrentDomain.</span><span style="color:#B392F0">SetData</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"DataDirectory"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"C:</span><span style="color:#79B8FF">\\</span><span style="color:#9ECBFF">PhocalStream</span><span style="color:#79B8FF">\\</span><span style="color:#9ECBFF">Phocalstream</span><span style="color:#79B8FF">\\</span><span style="color:#9ECBFF">Phocalstream_Web</span><span style="color:#79B8FF">\\</span><span style="color:#9ECBFF">App_Data"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">	System.IO.Directory.</span><span style="color:#B392F0">SetCurrentDirectory</span><span style="color:#E1E4E8">(ConfigurationManager.AppSettings[</span><span style="color:#9ECBFF">"outputPath"</span><span style="color:#E1E4E8">]);</span></span>
+<span class="line"><span style="color:#B392F0">	TcpChannel</span><span style="color:#B392F0"> channel</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TcpChannel</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">8084</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">	ChannelServices.</span><span style="color:#B392F0">RegisterChannel</span><span style="color:#E1E4E8">(channel, </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">	</span></span>
+<span class="line"><span style="color:#6A737D">	// This is the service URI that we're looking for, "TimeLapseManager" is the service URI, which is exactly the same as the type name.</span></span>
+<span class="line"><span style="color:#E1E4E8">	RemotingConfiguration.</span><span style="color:#B392F0">RegisterWellKnownServiceType</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">TimeLapseManager</span><span style="color:#E1E4E8">), </span><span style="color:#9ECBFF">"TimeLapseManager"</span><span style="color:#E1E4E8">, WellKnownObjectMode.Singleton);</span></span>
+<span class="line"><span style="color:#E1E4E8">	</span></span>
+<span class="line"><span style="color:#B392F0">	ITimeLapseManager</span><span style="color:#B392F0"> manager</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">ITimeLapseManager</span><span style="color:#E1E4E8">)Activator.</span><span style="color:#B392F0">GetObject</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">typeof</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">ITimeLapseManager</span><span style="color:#E1E4E8">), </span><span style="color:#9ECBFF">"tcp://localhost:8084/TimeLapseManager"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">	manager.</span><span style="color:#B392F0">ImportJobs</span><span style="color:#E1E4E8">(ConfigurationManager.AppSettings[</span><span style="color:#9ECBFF">"outputPath"</span><span style="color:#E1E4E8">] </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> "/jobs.ini"</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+</div>
+
+<p>While you're in there, it's also worth checking the <code>TypeFilterLevel</code> configuration. If it's set explicitly to <code>Full</code> in the config or in code, you are in great shape, the gadget chains the tool uses will work directly. You can look for this in <code>app.config</code> or <code>web.config</code> files packaged with the application, or in code that calls <code>RemotingConfiguration.Configure()</code>. If it's set to <code>Low</code> or is not explicitly set (which defaults to <code>Low</code>), you'll need the more advanced techniques covered later.</p>
+<p>Here is an example of the <code>TypeFilterLevel</code> setting in source code (taken from the <a href="https://github.com/MediaPortal/MediaPortal-1">MediaPortal-1</a> application as an example):</p>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#F97583">private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> RegisterChannel</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#F97583">  try</span></span>
+<span class="line"><span style="color:#E1E4E8">  {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> (_callbackChannel </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    {</span></span>
+<span class="line"><span style="color:#E1E4E8">      Log.</span><span style="color:#B392F0">Debug</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"RemoteControl: RegisterChannel first called in Domain {0} for thread {1} with id {2}"</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">                AppDomain.CurrentDomain.FriendlyName, Thread.CurrentThread.Name,</span></span>
+<span class="line"><span style="color:#E1E4E8">                Thread.CurrentThread.ManagedThreadId);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">       // Here we can see that custom errors are disabled.</span></span>
+<span class="line"><span style="color:#E1E4E8">       RemotingConfiguration.CustomErrorsMode </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> CustomErrorsModes.Off;</span></span>
+<span class="line"><span style="color:#E1E4E8">          </span></span>
+<span class="line"><span style="color:#B392F0">       BinaryServerFormatterSinkProvider</span><span style="color:#B392F0"> provider</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> BinaryServerFormatterSinkProvider</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">          </span></span>
+<span class="line"><span style="color:#6A737D">       // Setting the TypeFilterLevel to Full means that the gadget chains the tool uses will work directly.</span></span>
+<span class="line"><span style="color:#E1E4E8">       provider.TypeFilterLevel </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> TypeFilterLevel.Full;</span></span>
+<span class="line"><span style="color:#E1E4E8">          </span></span>
+<span class="line"><span style="color:#B392F0">       IDictionary</span><span style="color:#B392F0"> channelProperties</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Hashtable</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">       channelProperties.</span><span style="color:#B392F0">Add</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"port"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">       channelProperties.</span><span style="color:#B392F0">Add</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"timeout"</span><span style="color:#E1E4E8">, TimeOut);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">       _callbackChannel </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> TcpChannel</span><span style="color:#E1E4E8">(channelProperties, </span><span style="color:#79B8FF">null</span><span style="color:#E1E4E8">, provider);</span></span>
+<span class="line"><span style="color:#E1E4E8">       ChannelServices.</span><span style="color:#B392F0">RegisterChannel</span><span style="color:#E1E4E8">(_callbackChannel, </span><span style="color:#79B8FF">false</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">     }</span></span>
+<span class="line"><span style="color:#E1E4E8">   }</span></span>
+<span class="line"><span style="color:#F97583">   catch</span><span style="color:#E1E4E8"> (</span><span style="color:#B392F0">Exception</span><span style="color:#B392F0"> e</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">   {</span></span>
+<span class="line"><span style="color:#E1E4E8">     Log.</span><span style="color:#B392F0">Error</span><span style="color:#E1E4E8">(e.</span><span style="color:#B392F0">ToString</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">   }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+</div>
+
+<p>Once you have the URI, pass it directly to the tool:</p>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#B392F0">./RemotingReloaded</span><span style="color:#79B8FF"> -t</span><span style="color:#9ECBFF"> tcp://192.168.1.10:4242/TheServiceUriYouFound</span><span style="color:#79B8FF"> -c</span><span style="color:#9ECBFF"> "calc.exe"</span></span></code></pre>
+</div>
+
+<p><img alt="RemotingReloaded successful exploitation after specifying URI" src="../../images/remoting-3.png" /></p>
+<h3 id="building-your-own-wordlist">Building Your Own Wordlist<a href="#building-your-own-wordlist" class="heading-anchor" aria-label="Link to this section">#</a></h3>
+<p>If you can't get the assemblies but you have some context on the application, you can make educated guesses. A few patterns come up repeatedly in real-world .NET Remoting deployments:</p>
+<ul>
+<li>The URI is often just the type name of the service class itself, e.g. <code>MyService</code>, <code>DataService</code>, <code>ReportingService</code></li>
+<li>A common pattern is the type name with <code>Server</code> appended: <code>MyServiceServer</code>, <code>DataServer</code></li>
+<li>If you know the organization's namespace convention (something like <code>Orgname.ProductName.ServiceType</code>), you can use that as a starting point and build variations from it</li>
+<li>Config files and source code on the target or elsewhere in the environment may reference the URI indirectly through connection strings or client configuration</li>
+</ul>
+<p>The scripts in the <a href="https://github.com/Tut-k0/RemotingReloaded/tree/main/Scripts">RemotingReloaded/Scripts</a> directory are what I used to generate the built-in wordlist. They scrape GitHub for <code>.NET Remoting</code> config files and C# source registrations. You can run them yourself to pull a fresh extended wordlist, and they also give you a good sense of what naming patterns actually appear in the wild.</p>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span style="color:#6A737D"># Merge both script outputs into a single wordlist</span></span>
+<span class="line"><span style="color:#B392F0">python</span><span style="color:#9ECBFF"> github_config_scraper.py</span></span>
+<span class="line"><span style="color:#B392F0">python</span><span style="color:#9ECBFF"> github_source_scraper.py</span></span>
+<span class="line"><span style="color:#B392F0">cat</span><span style="color:#9ECBFF"> wordlist/wordlist.txt</span><span style="color:#9ECBFF"> remoting_uris_github_source.txt</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> sort</span><span style="color:#79B8FF"> -u</span><span style="color:#F97583"> ></span><span style="color:#9ECBFF"> combined_wordlist.txt</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Pass it to the tool</span></span>
+<span class="line"><span style="color:#B392F0">./RemotingReloaded</span><span style="color:#79B8FF"> -t</span><span style="color:#9ECBFF"> tcp://192.168.1.10:4242</span><span style="color:#79B8FF"> -c</span><span style="color:#9ECBFF"> "calc.exe"</span><span style="color:#79B8FF"> -w</span><span style="color:#9ECBFF"> combined_wordlist.txt</span></span></code></pre>
+</div>
+
+<h2 id="typefilterlevel--low">TypeFilterLevel = Low<a href="#typefilterlevel--low" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>If <code>TypeFilterLevel</code> is set to <code>Low</code> (or not set at all, since <code>Low</code> is the default), the current gadget chains get blocked by Code Access Security (CAS). The direct deserialization attacks that RemotingReloaded relies on will not work, and you'll see a warning for <code>TypeFilterLevel=Low detected</code> outcome in the tool output.</p>
+<p><img alt="RemotingReloaded warning for Low TypeFilterLevel" src="../../images/remoting-4.png" /></p>
+<p>RemotingReloaded does not currently implement bypasses for this configuration, it's something I'd like to add down the road, but it requires significant additional development. The techniques that do work here involve writing a FakeAsm (a fake assembly) to the server's filesystem and loading a type from it to register a new endpoint accessible via the existing remoting channel, from which you can then achieve RCE. This is where things get more involved.</p>
+<p>For now, if you find yourself here, the resources you need are:</p>
+<ul>
+<li><a href="https://www.tiraniddo.dev/2019/10/bypassing-low-type-filter-in-net.html">Bypassing Low Type Filter in .NET Remoting</a> by @tyranid, along with <a href="https://github.com/tyranid/ExploitRemotingService">ExploitRemotingService</a>.</li>
+<li><a href="https://codewhitesec.blogspot.com/2022/01/dotnet-remoting-revisited.html">.NET Remoting Revisited</a> by codewhitesec, which covers improvements including the <code>--useobjref</code> trick and the <code>--rename</code> option, along with <a href="https://github.com/codewhitesec/ExploitRemotingService">their fork of ExploitRemotingService</a> and <a href="https://github.com/codewhitesec/RogueRemotingServer">RogueRemotingServer</a>.</li>
+<li><a href="https://code-white.com/blog/teaching-the-old-net-remoting-new-exploitation-tricks/">Teaching the Old .NET Remoting New Exploitation Tricks</a> by codewhitesec, covering newer primitives for even more hardened targets, along with the <a href="https://github.com/codewhitesec/NewRemotingTricks">NewRemotingTricks</a> repo.</li>
+</ul>
+<p>These tools are all .NET Framework dependent, which means you need a Windows attack host to run them. It's extra setup, but if you have a target not falling over to the easy path, it's worth going the extra mile.</p>
+<p>For HTTP targets specifically, there's also CVE-2024-29059, a vulnerability affecting IIS and ASP.NET applications using specific libraries that can leak ObjRef endpoints. These exposed <code>.rem</code> endpoints can then be attacked via remoting deserialization. Since IIS-hosted services are typically <code>TypeFilterLevel = Low</code> by default, you'd need the Low bypasses in play here too. See the codewhitesec write-up: <a href="https://code-white.com/blog/leaking-objrefs-to-exploit-http-dotnet-remoting/">Leaking ObjRefs to Exploit HTTP .NET Remoting</a> and the associated <a href="https://github.com/codewhitesec/HttpRemotingObjRefLeak">HttpRemotingObjRefLeak</a> PoC.</p>
+<h2 id="secure-tcp-channel">Secure TCP Channel<a href="#secure-tcp-channel" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>TCP remoting services can also be configured with a secure channel, which requires Windows/Kerberos authentication before you can do anything with the service. These are the services that may show up in Nmap as <code>StorageCraft Image Manager</code> or <code>Microsoft Exchange 2010 log copier</code> as mentioned earlier. RemotingReloaded will return <code>AUTH_FAILED</code> or time out against these.</p>
+<p><img alt="RemotingReloaded failed authentication" src="../../images/remoting-5.png" /></p>
+<p>The good news is that if no custom <code>IAuthorizeRemotingConnection</code> is configured on the server side, any valid Windows account can authenticate - including <code>NT Authority\Anonymous Logon</code> (SID S-1-5-7). So the default configuration is not as locked down as it sounds. The workflow for attacking these is to first try anonymous logon, fall back to guest if that fails, and then try any credentials you have.</p>
+<p>Again, this requires .NET Framework and a Windows attack host. The <a href="https://codewhitesec.blogspot.com/2022/01/dotnet-remoting-revisited.html">codewhitesec .NET Remoting Revisited</a> article covers the secure channel in detail and is the reference to start from.</p>
+<h2 id="the-internet-exposed-attack-surface">The Internet-Exposed Attack Surface<a href="#the-internet-exposed-attack-surface" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p>While building all this out, I got curious about how many of these services are still publicly exposed, so I pulled up Shodan and Censys. I was a bit surprised by the results, thousands of services are still sitting on the internet in 2026. Not a massive number compared to other hot items these days, but for a deprecated technology largely replaced over fifteen years ago, it's more than you might expect.</p>
+<p>Some queries to check yourself:</p>
+<div class="code-block-wrapper">
+<button class="copy-button" onclick="copyCode(this)" aria-label="Copy code">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<span class="copy-text">Copy</span>
+</button>
+<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code><span class="line"><span># Catches both TCP and a good chunk of HTTP services</span></span>
+<span class="line"><span>product:"MS .NET Remoting"</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># Raw error-based searches - hits services throwing remoting exceptions directly</span></span>
+<span class="line"><span>"System.Runtime.Remoting.RemotingException"</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># Services with customErrors enabled leaking the config hint</span></span>
+<span class="line"><span>"To get more info turn on customErrors in the server's config file"</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># Censys query for HTTP services</span></span>
+<span class="line"><span>host.services.endpoints.http.headers.value: "MS .NET Remoting"</span></span></code></pre>
+</div>
+
+<p>Shodan results for <code>product:"MS .NET Remoting"</code> at time of post:</p>
+<p><img alt="Shodan results" src="../../images/remoting-6.png" /></p>
+<p>Censys results for <code>host.services.endpoints.http.headers.value: "MS .NET Remoting"</code> at time of post:</p>
+<p><img alt="Censys results" src="../../images/remoting-7.png" /></p>
+<p>If the public-facing count is in the thousands, internal usage across older enterprises is almost certainly in much higher numbers. Legacy .NET Framework applications don't get rewritten just because Microsoft deprecated the framework they were built on. These services are still out there, and they're worth keeping an eye out for.</p>
+<h1 id="conclusion">Conclusion<a href="#conclusion" class="heading-anchor" aria-label="Link to this section">#</a></h1>
+<p>.NET Remoting is old, deprecated, and still showing up on internal networks in 2026. When it does, the deserialization attack surface is well-documented and the exploitation path is fairly direct if you know where to look. RemotingReloaded handles the common case cross-platform so you can quickly validate a target without spinning up a Windows box and chaining together a bunch of .NET Framework tooling. When the easy path doesn't work, the Low type filter and secure channel situations are solvable, just more involved, and the research from James Forshaw and codewhitesec is the place to start.</p>
+<p>As always, document everything, stay in scope, and clean up after yourself.</p>
+<h2 id="references">References<a href="#references" class="heading-anchor" aria-label="Link to this section">#</a></h2>
+<p><strong>RemotingReloaded builds on the prior work of:</strong></p>
+<ul>
+<li>ExploitRemotingService by @tyranid: <a href="https://github.com/tyranid/ExploitRemotingService">https://github.com/tyranid/ExploitRemotingService</a></li>
+<li>RogueRemotingServer by codewhitesec: <a href="https://github.com/codewhitesec/RogueRemotingServer">https://github.com/codewhitesec/RogueRemotingServer</a></li>
+<li>ysoserial.net by @pwntester: <a href="https://github.com/pwntester/ysoserial.net">https://github.com/pwntester/ysoserial.net</a></li>
+<li>VulnerableDotNetHTTPRemoting by NCC Group: <a href="https://github.com/nccgroup/VulnerableDotNetHTTPRemoting">https://github.com/nccgroup/VulnerableDotNetHTTPRemoting</a></li>
+<li>Finding and Exploiting .NET Remoting over HTTP using Deserialisation (NCC Group): <a href="https://www.nccgroup.com/research-blog/finding-and-exploiting-net-remoting-over-http-using-deserialisation/">https://www.nccgroup.com/research-blog/finding-and-exploiting-net-remoting-over-http-using-deserialisation/</a></li>
+</ul>
+<p><strong>Advanced techniques and further reading:</strong></p>
+<ul>
+<li>Bypassing Low Type Filter in .NET Remoting (@tyranid): <a href="https://www.tiraniddo.dev/2019/10/bypassing-low-type-filter-in-net.html">https://www.tiraniddo.dev/2019/10/bypassing-low-type-filter-in-net.html</a></li>
+<li>.NET Remoting Revisited (codewhitesec): <a href="https://codewhitesec.blogspot.com/2022/01/dotnet-remoting-revisited.html">https://codewhitesec.blogspot.com/2022/01/dotnet-remoting-revisited.html</a></li>
+<li>codewhitesec ExploitRemotingService fork: <a href="https://github.com/codewhitesec/ExploitRemotingService">https://github.com/codewhitesec/ExploitRemotingService</a></li>
+<li>Teaching the Old .NET Remoting New Exploitation Tricks (codewhitesec): <a href="https://code-white.com/blog/teaching-the-old-net-remoting-new-exploitation-tricks/">https://code-white.com/blog/teaching-the-old-net-remoting-new-exploitation-tricks/</a></li>
+<li>NewRemotingTricks (codewhitesec): <a href="https://github.com/codewhitesec/NewRemotingTricks">https://github.com/codewhitesec/NewRemotingTricks</a></li>
+<li>Leaking ObjRefs to Exploit HTTP .NET Remoting (codewhitesec): <a href="https://code-white.com/blog/leaking-objrefs-to-exploit-http-dotnet-remoting/">https://code-white.com/blog/leaking-objrefs-to-exploit-http-dotnet-remoting/</a></li>
+<li>HttpRemotingObjRefLeak (codewhitesec): <a href="https://github.com/codewhitesec/HttpRemotingObjRefLeak">https://github.com/codewhitesec/HttpRemotingObjRefLeak</a></li>
+<li>MS-NRBF Specification: <a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-nrbf/">https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-nrbf/</a></li>
+<li>MS-NRTP Specification: <a href="https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-nrtp/">https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-nrtp/</a></li>
+</ul>
+<hr />
+<p><em>P.S. - If you are still reading this and are a real human, I appreciate you taking the time to visit and read my blog.</em></p>
+            </div>
+        </article>
+        
+        <footer class="post-footer">
+            <div class="post-nav">
+                <a href="../../blog.html" class="btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    All Posts
+                </a>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<footer class="footer">
+    <p>Built without a framework because we don't need the bloat.</p>
+</footer>
+
+<script>
+// Copy code functionality
+function copyCode(button) {
+    const wrapper = button.parentElement;
+    const pre = wrapper.querySelector('pre');
+    const code = pre.textContent;
+    
+    navigator.clipboard.writeText(code).then(() => {
+        const textSpan = button.querySelector('.copy-text');
+        const originalText = textSpan.textContent;
+        textSpan.textContent = 'Copied!';
+        button.classList.add('copied');
+        
+        setTimeout(() => {
+            textSpan.textContent = originalText;
+            button.classList.remove('copied');
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+    });
+}
+
+// ToC toggle functionality
+function toggleToc() {
+    const toc = document.getElementById('toc');
+    toc.classList.toggle('collapsed');
+}
+
+// Mobile menu toggle
+function toggleMobileMenu() {
+    const navLinks = document.querySelector('.nav-links');
+    navLinks.classList.toggle('mobile-open');
+}
+
+// Reading progress bar
+function updateReadingProgress() {
+    const article = document.querySelector('.post-article');
+    const progressBar = document.getElementById('reading-progress');
+    
+    if (!article || !progressBar) return;
+    
+    const articleRect = article.getBoundingClientRect();
+    const articleTop = window.scrollY + articleRect.top;
+    const articleHeight = articleRect.height;
+    const windowHeight = window.innerHeight;
+    
+    const scrolled = window.scrollY - articleTop + windowHeight * 0.3;
+    const progress = Math.min(Math.max(scrolled / articleHeight * 100, 0), 100);
+    
+    progressBar.style.width = `${progress}%`;
+}
+
+// Active ToC highlighting
+function updateActiveTocItem() {
+    const headings = document.querySelectorAll('.blog-post-content h1[id], .blog-post-content h2[id], .blog-post-content h3[id], .blog-post-content h4[id]');
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    
+    if (!headings.length || !tocLinks.length) return;
+    
+    let activeId = null;
+    const scrollPos = window.scrollY + 100;
+    
+    headings.forEach(heading => {
+        if (heading.offsetTop <= scrollPos) {
+            activeId = heading.id;
+        }
+    });
+    
+    tocLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${activeId}`) {
+            link.classList.add('active');
+        }
+    });
+}
+
+// Smooth scroll for ToC links
+document.querySelectorAll('.toc-list a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').slice(1);
+        const targetElement = document.getElementById(targetId);
+        
+        if (targetElement) {
+            const offset = 80; // Account for sticky nav
+            const targetPosition = targetElement.offsetTop - offset;
+            
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+            
+            // Update URL without triggering scroll
+            history.pushState(null, null, `#${targetId}`);
+        }
+    });
+});
+
+// Event listeners
+window.addEventListener('scroll', () => {
+    updateReadingProgress();
+    updateActiveTocItem();
+}, { passive: true });
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    updateReadingProgress();
+    updateActiveTocItem();
+    
+    // Handle direct links to anchors
+    if (window.location.hash) {
+        setTimeout(() => {
+            const targetElement = document.querySelector(window.location.hash);
+            if (targetElement) {
+                const offset = 80;
+                window.scrollTo({
+                    top: targetElement.offsetTop - offset,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
+    }
+});
+</script>
+</body>
+</html>
